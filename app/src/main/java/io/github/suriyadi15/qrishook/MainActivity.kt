@@ -1,11 +1,14 @@
 package io.github.suriyadi15.qrishook
 
 import android.Manifest
+import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,6 +16,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.paging.compose.collectAsLazyPagingItems
 import io.github.suriyadi15.qrishook.notification.NotificationAccessHelper
@@ -21,14 +26,17 @@ import io.github.suriyadi15.qrishook.ui.QrisHookTheme
 
 class MainActivity : ComponentActivity() {
     private val viewModel: MainViewModel by viewModels()
+    private var notificationAccessGranted by mutableStateOf(false)
+    private var ignoringBatteryOptimizations by mutableStateOf(false)
     private val notificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) {
-        viewModel.syncQrisHookActive(isNotificationAccessGranted())
+        refreshSystemAccessState()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        refreshSystemAccessState()
         requestNotificationPermissionIfNeeded()
         setContent {
             QrisHookTheme {
@@ -37,7 +45,8 @@ class MainActivity : ComponentActivity() {
                 val debugLogs = viewModel.pagedDebugLogs.collectAsLazyPagingItems()
                 QrisHookScreen(
                     state = state.copy(
-                        notificationAccessGranted = isNotificationAccessGranted(),
+                        notificationAccessGranted = notificationAccessGranted,
+                        ignoringBatteryOptimizations = ignoringBatteryOptimizations,
                     ),
                     events = events,
                     debugLogs = debugLogs,
@@ -45,10 +54,20 @@ class MainActivity : ComponentActivity() {
                     onHistorySearchChange = viewModel::updateHistorySearchQuery,
                     onDebugSearchChange = viewModel::updateDebugSearchQuery,
                     onOpenNotificationAccess = {
-                        startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+                        startActivitySafely(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+                    },
+                    onOpenAppInfo = {
+                        startActivitySafely(
+                            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).setData(packageUri()),
+                        )
+                    },
+                    onRequestIgnoreBatteryOptimizations = {
+                        startActivitySafely(
+                            Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).setData(packageUri()),
+                        )
                     },
                     onOpenGitHub = {
-                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(PROJECT_URL)))
+                        startActivitySafely(Intent(Intent.ACTION_VIEW, Uri.parse(PROJECT_URL)))
                     },
                     onTestDelivery = viewModel::enqueueDelivery,
                     onClearDebugLogs = viewModel::clearDebugLogs,
@@ -59,12 +78,35 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.syncQrisHookActive(isNotificationAccessGranted())
+        refreshSystemAccessState()
         viewModel.refresh()
     }
 
     private fun isNotificationAccessGranted(): Boolean {
         return NotificationAccessHelper.isGranted(this)
+    }
+
+    private fun isIgnoringBatteryOptimizations(): Boolean {
+        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+        return powerManager.isIgnoringBatteryOptimizations(packageName)
+    }
+
+    private fun refreshSystemAccessState() {
+        notificationAccessGranted = isNotificationAccessGranted()
+        ignoringBatteryOptimizations = isIgnoringBatteryOptimizations()
+        viewModel.syncQrisHookActive(notificationAccessGranted)
+    }
+
+    private fun packageUri(): Uri {
+        return Uri.parse("package:$packageName")
+    }
+
+    private fun startActivitySafely(intent: Intent) {
+        try {
+            startActivity(intent)
+        } catch (_: ActivityNotFoundException) {
+            startActivity(Intent(Settings.ACTION_SETTINGS))
+        }
     }
 
     private fun requestNotificationPermissionIfNeeded() {

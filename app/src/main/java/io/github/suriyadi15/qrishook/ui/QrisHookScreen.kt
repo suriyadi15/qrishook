@@ -77,6 +77,8 @@ fun QrisHookScreen(
     onHistorySearchChange: (String) -> Unit,
     onDebugSearchChange: (String) -> Unit,
     onOpenNotificationAccess: () -> Unit,
+    onOpenAppInfo: () -> Unit,
+    onRequestIgnoreBatteryOptimizations: () -> Unit,
     onOpenGitHub: () -> Unit,
     onTestDelivery: () -> Unit,
     onClearDebugLogs: () -> Unit,
@@ -127,6 +129,8 @@ fun QrisHookScreen(
                 contentPadding = padding,
                 onSettingsChange = onSettingsChange,
                 onOpenNotificationAccess = onOpenNotificationAccess,
+                onOpenAppInfo = onOpenAppInfo,
+                onRequestIgnoreBatteryOptimizations = onRequestIgnoreBatteryOptimizations,
                 onOpenGitHub = onOpenGitHub,
                 onTestDelivery = onTestDelivery,
             )
@@ -194,6 +198,8 @@ private fun HomeScreen(
     contentPadding: PaddingValues,
     onSettingsChange: (AppSettings) -> Unit,
     onOpenNotificationAccess: () -> Unit,
+    onOpenAppInfo: () -> Unit,
+    onRequestIgnoreBatteryOptimizations: () -> Unit,
     onOpenGitHub: () -> Unit,
     onTestDelivery: () -> Unit,
 ) {
@@ -208,6 +214,7 @@ private fun HomeScreen(
             AccessSection(
                 granted = state.notificationAccessGranted,
                 onOpenNotificationAccess = onOpenNotificationAccess,
+                onOpenAppInfo = onOpenAppInfo,
             )
         }
         item {
@@ -215,6 +222,12 @@ private fun HomeScreen(
                 settings = state.settings,
                 notificationAccessGranted = state.notificationAccessGranted,
                 onSettingsChange = onSettingsChange,
+            )
+        }
+        item {
+            BatteryOptimizationSection(
+                ignoringBatteryOptimizations = state.ignoringBatteryOptimizations,
+                onRequestIgnoreBatteryOptimizations = onRequestIgnoreBatteryOptimizations,
             )
         }
         item {
@@ -417,6 +430,44 @@ private fun AppendState(
 private fun AccessSection(
     granted: Boolean,
     onOpenNotificationAccess: () -> Unit,
+    onOpenAppInfo: () -> Unit,
+) {
+    Section {
+        Text("Notification Access", fontWeight = FontWeight.SemiBold)
+        Spacer(Modifier.height(4.dp))
+        Text(
+            if (granted) "Enabled. QRIS Hook can read notifications."
+            else "Not enabled. Allow QRIS Hook in Android settings.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.secondary,
+        )
+        if (!granted) {
+            Spacer(Modifier.height(8.dp))
+            Text(
+                "If Android blocks this with restricted settings, open App Info, tap More, then Allow restricted settings.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.secondary,
+            )
+        }
+        Spacer(Modifier.height(12.dp))
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Button(onClick = onOpenNotificationAccess) {
+                Text(if (granted) "Open access" else "Enable access")
+            }
+            OutlinedButton(onClick = onOpenAppInfo) {
+                Text("App info")
+            }
+        }
+    }
+}
+
+@Composable
+private fun BatteryOptimizationSection(
+    ignoringBatteryOptimizations: Boolean,
+    onRequestIgnoreBatteryOptimizations: () -> Unit,
 ) {
     Section {
         Row(
@@ -429,16 +480,22 @@ private fun AccessSection(
                     .weight(1f)
                     .padding(end = 12.dp),
             ) {
-                Text("Notification Access", fontWeight = FontWeight.SemiBold)
+                Text("Battery", fontWeight = FontWeight.SemiBold)
                 Text(
-                    if (granted) "Enabled. QRIS Hook can read notifications."
-                    else "Not enabled. Allow QRIS Hook in Android settings.",
+                    if (ignoringBatteryOptimizations) {
+                        "No restrictions. Android should not stop QRIS Hook in the background."
+                    } else {
+                        "Restricted. Set no restrictions so notification monitoring keeps running."
+                    },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.secondary,
                 )
             }
-            Button(onClick = onOpenNotificationAccess) {
-                Text(if (granted) "Open" else "Enable")
+            Button(
+                enabled = !ignoringBatteryOptimizations,
+                onClick = onRequestIgnoreBatteryOptimizations,
+            ) {
+                Text(if (ignoringBatteryOptimizations) "Set" else "Allow")
             }
         }
     }

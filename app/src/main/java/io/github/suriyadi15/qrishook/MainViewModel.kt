@@ -140,6 +140,7 @@ data class MainUiState(
     val historySearchQuery: String = "",
     val debugSearchQuery: String = "",
     val notificationAccessGranted: Boolean = false,
+    val ignoringBatteryOptimizations: Boolean = false,
 )
 
 data class InstalledAppInfo(
