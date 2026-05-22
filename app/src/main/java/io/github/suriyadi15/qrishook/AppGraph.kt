@@ -9,6 +9,7 @@ import io.github.suriyadi15.qrishook.data.DebugNotificationRepository
 import io.github.suriyadi15.qrishook.data.EventRepository
 import io.github.suriyadi15.qrishook.data.SettingsRepository
 import io.github.suriyadi15.qrishook.merchant.QrisNotificationMatcher
+import io.github.suriyadi15.qrishook.update.GitHubUpdateChecker
 import io.github.suriyadi15.qrishook.webhook.WebhookClient
 import io.github.suriyadi15.qrishook.webhook.WebhookDeliveryRunner
 import kotlinx.coroutines.CoroutineScope
@@ -37,6 +38,7 @@ object AppGraph {
         val matcher = QrisNotificationMatcher()
         val webhookClient = WebhookClient()
         val webhookDeliveryRunner = WebhookDeliveryRunner(eventRepository, webhookClient)
+        val updateChecker = GitHubUpdateChecker()
         val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     }
 

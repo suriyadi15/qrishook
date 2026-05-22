@@ -10,6 +10,7 @@ import androidx.paging.cachedIn
 import io.github.suriyadi15.qrishook.data.AppSettings
 import io.github.suriyadi15.qrishook.notification.NotificationAccessHelper
 import io.github.suriyadi15.qrishook.notification.WatcherForegroundService
+import io.github.suriyadi15.qrishook.update.AppUpdateState
 import io.github.suriyadi15.qrishook.worker.WebhookDeliveryWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -24,13 +25,14 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalCoroutinesApi::class)
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val graph = AppGraph.get(application)
-    private val refreshTick = MutableStateFlow(0)
     private val installedApps = MutableStateFlow<List<InstalledAppInfo>>(emptyList())
     private val historySearchQuery = MutableStateFlow("")
     private val debugSearchQuery = MutableStateFlow("")
+    private val updateState = MutableStateFlow<AppUpdateState>(AppUpdateState.Idle)
 
     init {
         loadInstalledApps()
+        checkForUpdates()
     }
 
     val pagedEvents = historySearchQuery
@@ -46,13 +48,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         installedApps,
         historySearchQuery,
         debugSearchQuery,
-        refreshTick,
-    ) { settings, apps, historyQuery, debugQuery, _ ->
+        updateState,
+    ) { settings, apps, historyQuery, debugQuery, update ->
         MainUiState(
             settings = settings,
             installedApps = apps,
             historySearchQuery = historyQuery,
             debugSearchQuery = debugQuery,
+            updateState = update,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -85,8 +88,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun checkForUpdates() {
+        if (updateState.value is AppUpdateState.Loading) return
+
+        viewModelScope.launch(Dispatchers.IO) {
+            updateState.value = AppUpdateState.Loading
+            updateState.value = graph.updateChecker.check(BuildConfig.VERSION_NAME)
+        }
+    }
+
     fun refresh() {
-        refreshTick.value = refreshTick.value + 1
         loadInstalledApps()
     }
 
@@ -137,6 +148,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 data class MainUiState(
     val settings: AppSettings = AppSettings(),
     val installedApps: List<InstalledAppInfo> = emptyList(),
+    val appVersionName: String = BuildConfig.VERSION_NAME,
+    val appVersionCode: Int = BuildConfig.VERSION_CODE,
+    val updateState: AppUpdateState = AppUpdateState.Idle,
     val historySearchQuery: String = "",
     val debugSearchQuery: String = "",
     val notificationAccessGranted: Boolean = false,

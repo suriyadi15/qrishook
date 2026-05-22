@@ -63,6 +63,7 @@ import io.github.suriyadi15.qrishook.data.AppSettings
 import io.github.suriyadi15.qrishook.data.DebugNotificationEntity
 import io.github.suriyadi15.qrishook.data.EventEntity
 import io.github.suriyadi15.qrishook.merchant.MerchantRegistry
+import io.github.suriyadi15.qrishook.update.AppUpdateState
 import io.github.suriyadi15.qrishook.webhook.WebhookPayloadBuilder
 import java.text.DateFormat
 import java.util.Date
@@ -81,6 +82,8 @@ fun QrisHookScreen(
     onRequestIgnoreBatteryOptimizations: () -> Unit,
     onOpenGitHub: () -> Unit,
     onOpenMerchantParserRequest: () -> Unit,
+    onCheckForUpdates: () -> Unit,
+    onOpenUpdate: (String) -> Unit,
     onTestDelivery: () -> Unit,
     onClearDebugLogs: () -> Unit,
 ) {
@@ -133,6 +136,8 @@ fun QrisHookScreen(
                 onOpenAppInfo = onOpenAppInfo,
                 onRequestIgnoreBatteryOptimizations = onRequestIgnoreBatteryOptimizations,
                 onOpenGitHub = onOpenGitHub,
+                onCheckForUpdates = onCheckForUpdates,
+                onOpenUpdate = onOpenUpdate,
                 onTestDelivery = onTestDelivery,
             )
 
@@ -203,6 +208,8 @@ private fun HomeScreen(
     onOpenAppInfo: () -> Unit,
     onRequestIgnoreBatteryOptimizations: () -> Unit,
     onOpenGitHub: () -> Unit,
+    onCheckForUpdates: () -> Unit,
+    onOpenUpdate: (String) -> Unit,
     onTestDelivery: () -> Unit,
 ) {
     LazyColumn(
@@ -247,6 +254,15 @@ private fun HomeScreen(
         }
         item {
             OpenSourceSection(onOpenGitHub = onOpenGitHub)
+        }
+        item {
+            AppVersionSection(
+                versionName = state.appVersionName,
+                versionCode = state.appVersionCode,
+                updateState = state.updateState,
+                onCheckForUpdates = onCheckForUpdates,
+                onOpenUpdate = onOpenUpdate,
+            )
         }
     }
 }
@@ -646,6 +662,59 @@ private fun OpenSourceSection(
                 Text("GitHub")
             }
         }
+    }
+}
+
+@Composable
+private fun AppVersionSection(
+    versionName: String,
+    versionCode: Int,
+    updateState: AppUpdateState,
+    onCheckForUpdates: () -> Unit,
+    onOpenUpdate: (String) -> Unit,
+) {
+    Section {
+        Text("App Version", fontWeight = FontWeight.SemiBold)
+        Spacer(Modifier.height(4.dp))
+        Text(
+            "Version $versionName ($versionCode)",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.secondary,
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = updateStateText(updateState),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.secondary,
+        )
+        Spacer(Modifier.height(12.dp))
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            OutlinedButton(
+                enabled = updateState !is AppUpdateState.Loading,
+                onClick = onCheckForUpdates,
+            ) {
+                Text(if (updateState is AppUpdateState.Loading) "Checking..." else "Check update")
+            }
+
+            if (updateState is AppUpdateState.UpdateAvailable) {
+                Button(onClick = { onOpenUpdate(updateState.downloadUrl) }) {
+                    Text("Update")
+                }
+            }
+        }
+    }
+}
+
+private fun updateStateText(updateState: AppUpdateState): String {
+    return when (updateState) {
+        AppUpdateState.Idle -> "Update status has not been checked yet."
+        AppUpdateState.Loading -> "Checking latest GitHub release..."
+        is AppUpdateState.UpToDate -> "You are using the latest version (${updateState.latestVersion})."
+        is AppUpdateState.UpdateAvailable -> "Version ${updateState.latestVersion} is available."
+        is AppUpdateState.Error -> "Update check failed: ${updateState.message}"
     }
 }
 

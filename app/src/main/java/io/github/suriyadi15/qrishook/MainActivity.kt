@@ -74,6 +74,10 @@ class MainActivity : ComponentActivity() {
                             Intent(Intent.ACTION_VIEW, Uri.parse(MERCHANT_PARSER_REQUEST_URL)),
                         )
                     },
+                    onCheckForUpdates = viewModel::checkForUpdates,
+                    onOpenUpdate = { url ->
+                        startActivitySafely(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                    },
                     onTestDelivery = viewModel::enqueueDelivery,
                     onClearDebugLogs = viewModel::clearDebugLogs,
                 )
