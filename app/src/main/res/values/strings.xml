@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">QRIS Hook</string>
+    <string name="notification_listener_label">QRIS Hook Monitoring</string>
+</resources>
