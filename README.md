@@ -8,6 +8,25 @@ Source code and issue tracking are available at:
 https://github.com/suriyadi15/qrishook
 ```
 
+## Responsible Use and Disclaimer
+
+QRIS Hook is provided for lawful notification monitoring and webhook automation
+where the user has the right and permission to access the relevant device,
+notifications, merchant account, and webhook endpoint.
+
+You are solely responsible for how you configure, deploy, and use this
+application, including compliance with applicable laws, regulations, merchant
+terms, privacy obligations, and third-party service policies.
+
+Any misuse of this application, including unauthorized access, privacy
+violations, data manipulation, fraudulent activity, or other unlawful use, is
+outside the control and responsibility of the author and contributors.
+
+This software is provided "as is", without warranty of any kind. To the maximum
+extent permitted by law, the author and contributors are not liable for any
+claim, damage, loss, service interruption, data loss, or other liability arising
+from the use, misuse, inability to use, or distribution of this software.
+
 ## Features
 
 - Notification monitoring with `NotificationListenerService`.
@@ -239,3 +258,7 @@ Notification formats vary between merchant apps and app versions. If QRIS Hook d
 The copied debug payload is required. Parser requests without a debug payload cannot be implemented reliably.
 
 Before posting the issue, redact sensitive data such as customer names, phone numbers, account identifiers, transaction IDs, or any other private information.
+
+## License
+
+QRIS Hook is released under the [MIT License](LICENSE).
