@@ -8,6 +8,10 @@ Source code and issue tracking are available at:
 https://github.com/suriyadi15/qrishook
 ```
 
+## Download App
+
+[![Latest QRIS Hook](https://img.shields.io/github/v/release/suriyadi15/qrishook?label=Latest%20QRIS%20Hook&sort=semver)](https://github.com/suriyadi15/qrishook/releases/latest)
+
 ## Responsible Use and Disclaimer
 
 QRIS Hook is provided for lawful notification monitoring and webhook automation
