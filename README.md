@@ -131,27 +131,27 @@ Retry behavior:
 {
   "event_id": "uuid",
   "type": "qris.payment.success",
-  "merchant_id": "mandiri_merchant",
+  "merchant_id": "demo_merchant",
   "source_package": "com.example.merchant",
-  "source_app": "Mandiri Merchant",
-  "received_at": "2026-05-21T12:00:00+07:00",
+  "source_app": "Demo Merchant",
+  "received_at": "2030-05-21T12:00:00+07:00",
   "notification": {
     "source_package": "com.example.merchant",
-    "source_app": "Mandiri Merchant",
+    "source_app": "Demo Merchant",
     "title": "string",
     "text": "string",
     "big_text": "string",
-    "received_at": "2026-05-21T12:00:00Z"
+    "received_at": "2030-05-21T12:00:00Z"
   },
   "payment": {
     "amount": 10000,
     "currency": "IDR",
     "sender_name": "John Doe",
-    "payment_source": "Mandiri"
+    "payment_source": "Demo"
   },
   "raw": {
     "source_package": "com.example.merchant",
-    "source_app": "Mandiri Merchant",
+    "source_app": "Demo Merchant",
     "title": "string",
     "text": "string",
     "big_text": "string",

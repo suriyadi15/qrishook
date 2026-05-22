@@ -18,13 +18,13 @@ class EventEntityTest {
                 sourcePackage = "com.interactive.qrisid",
                 sourceApp = "InterActive QRIS",
                 title = "Transaksi InterActive QRIS",
-                text = "Pembayaran QRIS sebesar Rp 1 Jhon Doe - Mandiri telah diterima",
-                bigText = "Pembayaran QRIS sebesar Rp 1 Jhon Doe - Mandiri telah diterima",
+                text = "Pembayaran QRIS sebesar Rp 1 Sample Sender - Sample Source telah diterima",
+                bigText = "Pembayaran QRIS sebesar Rp 1 Sample Sender - Sample Source telah diterima",
             ),
             payment = QrisPaymentInfo(
                 amount = 1L,
-                senderName = "Jhon Doe",
-                paymentSource = "Mandiri",
+                senderName = "Sample Sender",
+                paymentSource = "Sample Source",
             ),
             receivedAt = Instant.parse("2026-05-21T12:00:00Z"),
         )
@@ -35,8 +35,8 @@ class EventEntityTest {
         assertEquals("com.interactive.qrisid", entity.sourcePackage)
         assertEquals(1L, entity.amount)
         assertEquals("IDR", entity.currency)
-        assertEquals("Jhon Doe", entity.senderName)
-        assertEquals("Mandiri", entity.paymentSource)
+        assertEquals("Sample Sender", entity.senderName)
+        assertEquals("Sample Source", entity.paymentSource)
         assertEquals(DeliveryStatus.Pending, entity.status)
         assertEquals(null, entity.lastResponseCode)
         assertEquals("", entity.lastResponseMessage)

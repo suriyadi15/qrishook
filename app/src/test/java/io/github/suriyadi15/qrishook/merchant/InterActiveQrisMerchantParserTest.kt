@@ -18,7 +18,7 @@ class InterActiveQrisMerchantParserTest {
             notification(
                 sourcePackage = "com.interactive.qrisid",
                 title = "Transaksi InterActive QRIS",
-                text = "Pembayaran QRIS sebesar Rp 1 Jhon Doe - Mandiri telah diterima",
+                text = "Pembayaran QRIS sebesar Rp 1 Sample Sender - Sample Source telah diterima",
             ),
         )
 
@@ -26,8 +26,8 @@ class InterActiveQrisMerchantParserTest {
         assertEquals("interactive_qris", event?.merchantId)
         assertEquals(1L, event?.payment?.amount)
         assertEquals("IDR", event?.payment?.currency)
-        assertEquals("Jhon Doe", event?.payment?.senderName)
-        assertEquals("Mandiri", event?.payment?.paymentSource)
+        assertEquals("Sample Sender", event?.payment?.senderName)
+        assertEquals("Sample Source", event?.payment?.paymentSource)
     }
 
     @Test
@@ -37,7 +37,7 @@ class InterActiveQrisMerchantParserTest {
                 notification(
                     sourcePackage = "com.other.app",
                     title = "Transaksi InterActive QRIS",
-                    text = "Pembayaran QRIS sebesar Rp 1 Jhon Doe - Mandiri telah diterima",
+                    text = "Pembayaran QRIS sebesar Rp 1 Sample Sender - Sample Source telah diterima",
                 ),
             ),
         )
@@ -49,7 +49,7 @@ class InterActiveQrisMerchantParserTest {
             notification(
                 sourcePackage = "com.interactive.qrisid",
                 title = "Transaksi InterActive QRIS",
-                text = "Pembayaran QRIS Jhon Doe - Mandiri telah diterima",
+                text = "Pembayaran QRIS Sample Sender - Sample Source telah diterima",
             ),
         )
 

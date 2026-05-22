@@ -13,9 +13,9 @@ class WebhookPayloadBuilderTest {
 
         assertTrue(payload.contains("\"event_id\":\"event-1\""))
         assertTrue(payload.contains("\"type\":\"qris.payment.success\""))
-        assertTrue(payload.contains("\"merchant_id\":\"mandiri_merchant\""))
-        assertTrue(payload.contains("\"source_package\":\"com.bankmandiri.merchant\""))
-        assertTrue(payload.contains("\"source_app\":\"Mandiri Merchant\""))
+        assertTrue(payload.contains("\"merchant_id\":\"sample_merchant\""))
+        assertTrue(payload.contains("\"source_package\":\"com.example.merchant\""))
+        assertTrue(payload.contains("\"source_app\":\"Sample Merchant\""))
         assertFalse(payload.contains("\"received_at\":\"2026-05-21T12:00:00Z\",\"title\""))
         assertFalse(payload.contains("\"received_at\":\"2026-05-21T12:00:00Z\",\"text\""))
         assertFalse(payload.contains("\"received_at\":\"2026-05-21T12:00:00Z\",\"amount\""))
@@ -23,8 +23,8 @@ class WebhookPayloadBuilderTest {
         assertTrue(
             payload.contains(
                 "\"notification\":{" +
-                    "\"source_package\":\"com.bankmandiri.merchant\"," +
-                    "\"source_app\":\"Mandiri Merchant\"," +
+                    "\"source_package\":\"com.example.merchant\"," +
+                    "\"source_app\":\"Sample Merchant\"," +
                     "\"title\":\"Pembayaran QRIS berhasil\"," +
                     "\"text\":\"QRIS dibayar Rp10.000\"," +
                     "\"big_text\":\"Detail transaksi\"," +
@@ -37,8 +37,8 @@ class WebhookPayloadBuilderTest {
                 "\"payment\":{" +
                     "\"amount\":10000," +
                     "\"currency\":\"IDR\"," +
-                    "\"sender_name\":\"Jhon Doe\"," +
-                    "\"payment_source\":\"Mandiri\"" +
+                    "\"sender_name\":\"Sample Sender\"," +
+                    "\"payment_source\":\"Sample Source\"" +
                     "}",
             ),
         )
@@ -46,8 +46,8 @@ class WebhookPayloadBuilderTest {
         assertTrue(
             payload.contains(
                 "\"raw\":{" +
-                    "\"source_package\":\"com.bankmandiri.merchant\"," +
-                    "\"source_app\":\"Mandiri Merchant\"," +
+                    "\"source_package\":\"com.example.merchant\"," +
+                    "\"source_app\":\"Sample Merchant\"," +
                     "\"title\":\"Pembayaran QRIS berhasil\"," +
                     "\"text\":\"QRIS dibayar Rp10.000\"," +
                     "\"big_text\":\"Detail transaksi\"," +
@@ -63,16 +63,16 @@ class WebhookPayloadBuilderTest {
     private fun event() = EventEntity(
         eventId = "event-1",
         type = "qris.payment.success",
-        merchantId = "mandiri_merchant",
-        sourcePackage = "com.bankmandiri.merchant",
-        sourceApp = "Mandiri Merchant",
+        merchantId = "sample_merchant",
+        sourcePackage = "com.example.merchant",
+        sourceApp = "Sample Merchant",
         title = "Pembayaran QRIS berhasil",
         text = "QRIS dibayar Rp10.000",
         bigText = "Detail transaksi",
         amount = 10_000L,
         currency = "IDR",
-        senderName = "Jhon Doe",
-        paymentSource = "Mandiri",
+        senderName = "Sample Sender",
+        paymentSource = "Sample Source",
         receivedAt = "2026-05-21T12:00:00Z",
         status = DeliveryStatus.Pending,
         attempts = 0,

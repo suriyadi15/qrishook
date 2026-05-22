@@ -17,7 +17,7 @@ class QrisNotificationMatcherTest {
         val events = matcher.match(
             notification = notification(
                 title = "Pembayaran QRIS berhasil",
-                text = "Pembayaran QRIS sebesar Rp. 10.000 BUDI - BCA telah diterima",
+                text = "Pembayaran QRIS sebesar Rp. 10.000 Sample Sender - Sample Source telah diterima",
             ),
             merchants = listOf(parser),
         )
@@ -56,7 +56,7 @@ class QrisNotificationMatcherTest {
             notification = notification(
                 sourcePackage = "com.other.app",
                 title = "Pembayaran QRIS berhasil",
-                text = "Pembayaran QRIS sebesar Rp. 10.000 BUDI - BCA telah diterima",
+                text = "Pembayaran QRIS sebesar Rp. 10.000 Sample Sender - Sample Source telah diterima",
             ),
             merchants = listOf(parser),
         )
@@ -82,7 +82,7 @@ class QrisNotificationMatcherTest {
         val events = matcher.match(
             notification = notification(
                 title = "Pembayaran QRIS berhasil",
-                text = "Pembayaran QRIS sebesar Rp. 10.000 BUDI - BCA telah diterima",
+                text = "Pembayaran QRIS sebesar Rp. 10.000 Sample Sender - Sample Source telah diterima",
             ),
             merchants = listOf(parser, secondParser),
         )
@@ -109,7 +109,7 @@ class QrisNotificationMatcherTest {
             notification = notification(
                 sourcePackage = "com.other.app",
                 title = "Pembayaran QRIS berhasil",
-                text = "Pembayaran QRIS sebesar Rp. 10.000 BUDI - BCA telah diterima",
+                text = "Pembayaran QRIS sebesar Rp. 10.000 Sample Sender - Sample Source telah diterima",
             ),
             merchants = listOf(parser),
         )
@@ -123,7 +123,7 @@ class QrisNotificationMatcherTest {
         val events = matcher.match(
             notification = notification(
                 title = "Pembayaran QRIS berhasil",
-                text = "Pembayaran QRIS sebesar Rp. 10.000 BUDI - BCA telah diterima",
+                text = "Pembayaran QRIS sebesar Rp. 10.000 Sample Sender - Sample Source telah diterima",
             ),
             merchants = emptyList(),
         )
