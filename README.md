@@ -230,10 +230,12 @@ Notification formats vary between merchant apps and app versions. If QRIS Hook d
 4. Trigger a real or test QRIS notification from that merchant app.
 5. Open `Debug Logs` in QRIS Hook.
 6. Open the captured log and tap `Copy`.
-7. Create a GitHub issue with:
+7. Create a `Merchant parser request` GitHub issue with:
    - merchant app name
    - package name
    - expected payment details
-   - copied debug payload
+   - copied debug payload from QRIS Hook `Debug Mode`
+
+The copied debug payload is required. Parser requests without a debug payload cannot be implemented reliably.
 
 Before posting the issue, redact sensitive data such as customer names, phone numbers, account identifiers, transaction IDs, or any other private information.

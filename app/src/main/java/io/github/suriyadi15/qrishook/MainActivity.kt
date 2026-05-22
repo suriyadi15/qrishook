@@ -69,6 +69,11 @@ class MainActivity : ComponentActivity() {
                     onOpenGitHub = {
                         startActivitySafely(Intent(Intent.ACTION_VIEW, Uri.parse(PROJECT_URL)))
                     },
+                    onOpenMerchantParserRequest = {
+                        startActivitySafely(
+                            Intent(Intent.ACTION_VIEW, Uri.parse(MERCHANT_PARSER_REQUEST_URL)),
+                        )
+                    },
                     onTestDelivery = viewModel::enqueueDelivery,
                     onClearDebugLogs = viewModel::clearDebugLogs,
                 )
@@ -120,5 +125,7 @@ class MainActivity : ComponentActivity() {
 
     private companion object {
         const val PROJECT_URL = "https://github.com/suriyadi15/qrishook"
+        const val MERCHANT_PARSER_REQUEST_URL =
+            "https://github.com/suriyadi15/qrishook/issues/new?template=merchant_parser_request.yml"
     }
 }

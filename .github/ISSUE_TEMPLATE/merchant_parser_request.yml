@@ -1,0 +1,83 @@
+name: Merchant parser request
+description: Request support for a merchant app by sharing a QRIS Hook debug payload.
+title: "[Merchant Parser] "
+labels:
+  - merchant-parser
+  - needs-triage
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping QRIS Hook support more merchants.
+
+        The debug payload is required. Without a payload copied from QRIS Hook Debug Mode, a parser cannot be added reliably.
+
+  - type: input
+    id: merchant_app_name
+    attributes:
+      label: Merchant app name
+      description: The app that sent the QRIS payment notification.
+      placeholder: "Example: InterActive QRIS"
+    validations:
+      required: true
+
+  - type: input
+    id: package_name
+    attributes:
+      label: Package name
+      description: The Android package name shown in QRIS Hook debug logs.
+      placeholder: "Example: com.interactive.qrisid"
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_payment_details
+    attributes:
+      label: Expected payment details
+      description: Tell us what QRIS Hook should extract from this notification.
+      placeholder: |
+        Amount: Rp10.000
+        Sender name: BUDI
+        Payment source: Bank or wallet name, if visible
+        Received time: 2026-05-22 10:30
+    validations:
+      required: true
+
+  - type: textarea
+    id: debug_payload
+    attributes:
+      label: Debug payload copied from QRIS Hook
+      description: This is the most important field. Open the captured Debug Log in QRIS Hook, tap Copy, then paste the full payload here.
+      render: json
+      placeholder: |
+        Paste the full JSON payload copied from QRIS Hook Debug Mode.
+    validations:
+      required: true
+
+  - type: input
+    id: qris_hook_version
+    attributes:
+      label: QRIS Hook version
+      description: The QRIS Hook app version or build you used.
+      placeholder: "Example: 1.2.3 or debug build from commit abc123"
+    validations:
+      required: true
+
+  - type: input
+    id: android_version
+    attributes:
+      label: Android version and device
+      description: Include Android version and device model if known.
+      placeholder: "Example: Android 14, Pixel 7"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      options:
+        - label: I pasted the payload copied from QRIS Hook Debug Mode.
+          required: true
+        - label: I redacted sensitive data such as customer names, phone numbers, account identifiers, transaction IDs, and other private information.
+          required: true

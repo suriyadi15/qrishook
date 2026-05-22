@@ -80,6 +80,7 @@ fun QrisHookScreen(
     onOpenAppInfo: () -> Unit,
     onRequestIgnoreBatteryOptimizations: () -> Unit,
     onOpenGitHub: () -> Unit,
+    onOpenMerchantParserRequest: () -> Unit,
     onTestDelivery: () -> Unit,
     onClearDebugLogs: () -> Unit,
 ) {
@@ -151,6 +152,7 @@ fun QrisHookScreen(
                 onSearchChange = onDebugSearchChange,
                 onDebugLogClick = { selectedDebugLog = it },
                 onClearDebugLogs = onClearDebugLogs,
+                onOpenMerchantParserRequest = onOpenMerchantParserRequest,
             )
         }
     }
@@ -319,6 +321,7 @@ private fun DebugModeScreen(
     onSearchChange: (String) -> Unit,
     onDebugLogClick: (DebugNotificationEntity) -> Unit,
     onClearDebugLogs: () -> Unit,
+    onOpenMerchantParserRequest: () -> Unit,
 ) {
     var showAppPicker by remember { mutableStateOf(false) }
 
@@ -334,6 +337,11 @@ private fun DebugModeScreen(
                 settings = state.settings,
                 onSettingsChange = onSettingsChange,
                 onPickApps = { showAppPicker = true },
+            )
+        }
+        item {
+            MerchantParserContributionSection(
+                onOpenMerchantParserRequest = onOpenMerchantParserRequest,
             )
         }
         item {
@@ -688,6 +696,31 @@ private fun DebugSettingsSection(
             OutlinedButton(onClick = onPickApps) {
                 Text("Select apps")
             }
+        }
+    }
+}
+
+@Composable
+private fun MerchantParserContributionSection(
+    onOpenMerchantParserRequest: () -> Unit,
+) {
+    Section {
+        Text("Request a Merchant Parser", fontWeight = FontWeight.SemiBold)
+        Spacer(Modifier.height(8.dp))
+        Text(
+            "To support a new merchant, the issue must include a debug payload copied from QRIS Hook.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.secondary,
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            "Turn on Debug Mode, select the merchant app, make a real or test QRIS payment, open the captured debug log, tap Copy, then paste that payload into the GitHub issue.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.secondary,
+        )
+        Spacer(Modifier.height(12.dp))
+        OutlinedButton(onClick = onOpenMerchantParserRequest) {
+            Text("Open parser request")
         }
     }
 }
