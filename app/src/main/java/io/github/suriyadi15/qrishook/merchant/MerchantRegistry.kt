@@ -3,6 +3,7 @@ package io.github.suriyadi15.qrishook.merchant
 object MerchantRegistry {
     val builtInParsers: List<MerchantParser> = listOf(
         InterActiveQrisMerchantParser,
+        BriMerchantParser,
     )
 
     fun selectedParsers(selectedMerchantIds: Set<String>): List<MerchantParser> {
