@@ -7,10 +7,10 @@ class MerchantRegistryTest {
     @Test
     fun selectedParsersReturnsOnlySelectedParsers() {
         val parsers = MerchantRegistry.selectedParsers(
-            setOf("interactive_qris", "bri_merchant", "unknown_merchant"),
+            setOf("interactive_qris", "bri_merchant", "gopay_merchant", "unknown_merchant"),
         )
 
-        assertEquals(listOf("interactive_qris", "bri_merchant"), parsers.map { it.merchantId })
+        assertEquals(listOf("interactive_qris", "bri_merchant", "gopay_merchant"), parsers.map { it.merchantId })
     }
 
     @Test
