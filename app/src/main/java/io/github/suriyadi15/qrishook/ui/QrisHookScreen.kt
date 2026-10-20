@@ -81,7 +81,7 @@ fun QrisHookScreen(
     onOpenAppInfo: () -> Unit,
     onRequestIgnoreBatteryOptimizations: () -> Unit,
     onOpenGitHub: () -> Unit,
-    onOpenMerchantParserRequest: () -> Unit,
+    onOpenMerchantParserRequest: (DebugNotificationEntity?) -> Unit,
     onCheckForUpdates: () -> Unit,
     onOpenUpdate: (String) -> Unit,
     onTestDelivery: () -> Unit,
@@ -166,6 +166,10 @@ fun QrisHookScreen(
         DebugPayloadDialog(
             log = log,
             onDismiss = { selectedDebugLog = null },
+            onRequestParser = {
+                selectedDebugLog = null
+                onOpenMerchantParserRequest(log)
+            },
         )
     }
 
@@ -337,7 +341,7 @@ private fun DebugModeScreen(
     onSearchChange: (String) -> Unit,
     onDebugLogClick: (DebugNotificationEntity) -> Unit,
     onClearDebugLogs: () -> Unit,
-    onOpenMerchantParserRequest: () -> Unit,
+    onOpenMerchantParserRequest: (DebugNotificationEntity?) -> Unit,
 ) {
     var showAppPicker by remember { mutableStateOf(false) }
 
@@ -357,7 +361,7 @@ private fun DebugModeScreen(
         }
         item {
             MerchantParserContributionSection(
-                onOpenMerchantParserRequest = onOpenMerchantParserRequest,
+                onOpenMerchantParserRequest = { onOpenMerchantParserRequest(null) },
             )
         }
         item {
@@ -783,7 +787,13 @@ private fun MerchantParserContributionSection(
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            "Turn on Debug Mode, select the merchant app, make a real or test QRIS payment, open the captured debug log, tap Copy, then paste that payload into the GitHub issue.",
+            "Turn on Debug Mode, select the merchant app, make a real or test QRIS payment, open the captured debug log, then tap Request parser. The GitHub issue form will be prefilled with the app, package, payload, and device details.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.secondary,
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            "Redact sensitive data such as customer names, account numbers, and transaction IDs before submitting.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.secondary,
         )
@@ -991,6 +1001,7 @@ private fun DebugLogRow(
 private fun DebugPayloadDialog(
     log: DebugNotificationEntity,
     onDismiss: () -> Unit,
+    onRequestParser: () -> Unit,
 ) {
     val context = LocalContext.current
     AlertDialog(
@@ -1007,16 +1018,21 @@ private fun DebugPayloadDialog(
             )
         },
         confirmButton = {
-            TextButton(
-                onClick = {
-                    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE)
-                        as ClipboardManager
-                    clipboard.setPrimaryClip(
-                        ClipData.newPlainText("Notification payload", log.payloadJson),
-                    )
-                },
-            ) {
-                Text("Copy")
+            Row {
+                TextButton(onClick = onRequestParser) {
+                    Text("Request parser")
+                }
+                TextButton(
+                    onClick = {
+                        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE)
+                            as ClipboardManager
+                        clipboard.setPrimaryClip(
+                            ClipData.newPlainText("Notification payload", log.payloadJson),
+                        )
+                    },
+                ) {
+                    Text("Copy")
+                }
             }
         },
         dismissButton = {
