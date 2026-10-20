@@ -4,6 +4,7 @@ object MerchantRegistry {
     val builtInParsers: List<MerchantParser> = listOf(
         InterActiveQrisMerchantParser,
         BriMerchantParser,
+        GoPayMerchantParser,
     )
 
     fun selectedParsers(selectedMerchantIds: Set<String>): List<MerchantParser> {
