@@ -193,16 +193,17 @@ app/build/outputs/apk/debug/app-debug.apk
 
 ## Automated Releases
 
-Pushes to `main` run the GitHub Actions release workflow. The workflow uses
-Conventional Commits through `semantic-release` to choose the next version,
-builds a signed release APK, creates a GitHub Release, and uploads the APK as a
-release asset.
+The GitHub Actions release workflow runs only when a version tag (`vX.Y.Z`) is
+pushed. It uses the tag as the app version, builds a signed release APK,
+creates a GitHub Release with generated notes, and uploads the APK as a release
+asset. Pushes to branches do not trigger a release.
 
-Commit types that create releases:
+To publish a new version:
 
-- `fix: ...` creates a patch release, for example `0.1.0` to `0.1.1`.
-- `feat: ...` creates a minor release, for example `0.1.0` to `0.2.0`.
-- `feat!: ...` or a commit body with `BREAKING CHANGE:` creates a major release.
+```bash
+git tag v1.3.0
+git push origin v1.3.0
+```
 
 Required GitHub repository secrets:
 
@@ -215,15 +216,6 @@ Create `ANDROID_KEYSTORE_BASE64` from the release keystore:
 
 ```bash
 base64 -w 0 release-keystore.jks
-```
-
-The current local fallback version is `0.1.0`. To make `semantic-release` start
-from that version, create and push the initial tag before the first automated
-release:
-
-```bash
-git tag v0.1.0
-git push origin v0.1.0
 ```
 
 ## Adding a Merchant Parser

@@ -2,9 +2,8 @@ name: Release
 
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch:
+    tags:
+      - "v*.*.*"
 
 permissions:
   contents: read
@@ -15,8 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      issues: write
-      pull-requests: write
     env:
       ANDROID_VERSION_CODE: ${{ github.run_number }}
       ANDROID_KEYSTORE_PATH: ${{ github.workspace }}/release-keystore.jks
@@ -42,14 +39,6 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-
-      - name: Install release tooling
-        run: npm ci --no-audit --no-fund
-
       - name: Validate signing secrets
         run: |
           test -n "$ANDROID_KEYSTORE_BASE64"
@@ -64,10 +53,27 @@ jobs:
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
 
-      - name: Release
-        run: npx semantic-release
+      - name: Resolve version from tag
+        run: echo "ANDROID_VERSION_NAME=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+
+      - name: Test and build signed APK
+        run: |
+          ./gradlew testDebugUnitTest assembleRelease
+          mkdir -p release
+          cp app/build/outputs/apk/release/app-release.apk "release/qrishook-${GITHUB_REF_NAME}-release.apk"
+
+      - name: Publish GitHub Release
+        run: |
+          if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" release/*.apk --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" release/*.apk \
+              --title "$GITHUB_REF_NAME" \
+              --generate-notes \
+              --verify-tag
+          fi
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload APK artifact
         if: always()
