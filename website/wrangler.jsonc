@@ -1,9 +1,0 @@
-{
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "qrishook",
-  "compatibility_date": "2026-10-01",
-  "pages_build_output_dir": "./dist",
-  "vars": {
-    "GITHUB_REPO": "suriyadi15/qrishook-requests"
-  }
-}
