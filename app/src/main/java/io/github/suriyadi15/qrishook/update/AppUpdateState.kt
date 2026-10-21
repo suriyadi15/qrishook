@@ -14,6 +14,15 @@ sealed interface AppUpdateState {
     ) : AppUpdateState
 
     data class Error(
-        val message: String,
-    ) : AppUpdateState
+        val reason: Reason,
+        val detail: String = "",
+    ) : AppUpdateState {
+        enum class Reason {
+            /** [detail] is the HTTP status code. */
+            Http,
+            Unreadable,
+            /** [detail] is the raw exception message. */
+            Other,
+        }
+    }
 }

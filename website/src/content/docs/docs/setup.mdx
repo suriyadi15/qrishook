@@ -11,9 +11,9 @@ import { Steps } from '@astrojs/starlight/components';
 
 2. **Aktifkan akses notifikasi.** Buka pengaturan Android → *Notification access* → aktifkan **QRIS Hook**.
 
-3. **Isi webhook.** Masukkan URL webhook dan, bila perlu, secret. Secret dikirim sebagai header `X-Webhook-Secret`.
+3. **Tambah webhook.** Ketuk **Tambah webhook**, isi nama, URL, dan bila perlu secret (dikirim sebagai header `X-Webhook-Secret`). Ketuk **Kirim tes** untuk memastikan server Anda membalas 2xx.
 
-4. **Pilih merchant.** Centang aplikasi merchant yang ingin dipantau (lihat [merchant didukung](/docs/merchants/)).
+4. **Pilih merchant.** Centang aplikasi merchant yang ingin dipantau (lihat [merchant didukung](/docs/merchants/)). Di editor webhook Anda memilih merchant mana yang dikirim ke webhook tersebut; merchant yang tidak dipilih memakai webhook **default**.
 
 5. **Nyalakan `QRIS Hook Active`.** Tanpa ini, notifikasi tidak diproses sama sekali.
 

@@ -44,6 +44,14 @@ If a secret is configured, the request includes:
 X-Webhook-Secret: your-secret
 ```
 
+## Multiple webhooks
+
+You can add several webhooks and route each merchant to one of them. A webhook can receive several merchants (for example BRI and GoPay to the same server), and merchants without an explicit webhook use the **default** one. A merchant with neither is not delivered, and the app warns you on the Home screen. Each webhook has its own optional secret, and the event detail shows which URL was last used.
+
+## Test event
+
+**Send test** posts a sample event to the URL you typed, without saving it. It has the same shape as a payment but `type` is `qris.webhook.test` and `merchant_id` is `test`, so receivers that filter on `type` won't record it as a real payment.
+
 ## Sample receiver
 
 Reply with a **2xx** status so the event is marked `Sent`. Use `event_id` for idempotency, since an event can be delivered again on retry.

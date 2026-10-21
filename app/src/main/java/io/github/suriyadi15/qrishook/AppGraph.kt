@@ -31,7 +31,7 @@ object AppGraph {
             context,
             AppDatabase::class.java,
             "qris_hook.db",
-        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4).build()
+        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5).build()
 
         val settingsRepository = SettingsRepository(context)
         val eventRepository = EventRepository(database.eventDao())
@@ -77,6 +77,12 @@ object AppGraph {
             db.execSQL("ALTER TABLE qris_events ADD COLUMN lastResponseMessage TEXT NOT NULL DEFAULT ''")
             db.execSQL("ALTER TABLE qris_events ADD COLUMN lastResponseBody TEXT NOT NULL DEFAULT ''")
             db.execSQL("ALTER TABLE qris_events ADD COLUMN lastWebhookAttemptAtMillis INTEGER")
+        }
+    }
+
+    private val MIGRATION_4_5 = object : Migration(4, 5) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE qris_events ADD COLUMN lastWebhookUrl TEXT NOT NULL DEFAULT ''")
         }
     }
 }

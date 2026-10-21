@@ -44,6 +44,14 @@ Jika secret diisi, request menyertakan:
 X-Webhook-Secret: your-secret
 ```
 
+## Beberapa webhook
+
+Anda bisa menambah beberapa webhook dan mengarahkan tiap merchant ke salah satunya. Satu webhook boleh menerima beberapa merchant (misalnya BRI dan GoPay ke server yang sama), dan merchant tanpa pilihan memakai webhook **default**. Merchant yang tidak punya keduanya tidak dikirim, dan aplikasi memberi peringatan di layar Beranda. Tiap webhook punya secret opsional sendiri, dan detail event menampilkan URL yang terakhir dipakai.
+
+## Event tes
+
+**Kirim tes** mengirim contoh event ke URL yang Anda ketik, tanpa menyimpannya. Bentuknya sama dengan pembayaran, tetapi `type` bernilai `qris.webhook.test` dan `merchant_id` bernilai `test`, jadi receiver yang memfilter `type` tidak akan mencatatnya sebagai pembayaran asli.
+
 ## Contoh receiver
 
 Balas status **2xx** agar event ditandai `Sent`. Gunakan `event_id` untuk idempotensi karena event bisa terkirim ulang saat retry.

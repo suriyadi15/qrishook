@@ -20,7 +20,19 @@ data class MerchantParserRequestInfo(
 
 sealed interface MerchantParserRequestResult {
     data class Success(val id: Int) : MerchantParserRequestResult
-    data class Failure(val message: String) : MerchantParserRequestResult
+    data class Failure(
+        val reason: Reason,
+        val detail: String = "",
+    ) : MerchantParserRequestResult {
+        enum class Reason {
+            UnexpectedResponse,
+            /** [detail] is the error text the server returned. */
+            ServerMessage,
+            /** [detail] is the HTTP status code. */
+            ServerHttp,
+            Unreachable,
+        }
+    }
 }
 
 class MerchantParserRequestClient(
@@ -48,15 +60,25 @@ class MerchantParserRequestClient(
                     if (id != null) {
                         MerchantParserRequestResult.Success(id)
                     } else {
-                        MerchantParserRequestResult.Failure("Unexpected server response")
+                        MerchantParserRequestResult.Failure(MerchantParserRequestResult.Failure.Reason.UnexpectedResponse)
                     }
                 } else {
                     val reason = runCatching { JSONObject(body).getString("error") }.getOrNull()
-                    MerchantParserRequestResult.Failure(reason ?: "Server error (HTTP ${response.code})")
+                    if (reason != null) {
+                        MerchantParserRequestResult.Failure(
+                            MerchantParserRequestResult.Failure.Reason.ServerMessage,
+                            reason,
+                        )
+                    } else {
+                        MerchantParserRequestResult.Failure(
+                            MerchantParserRequestResult.Failure.Reason.ServerHttp,
+                            response.code.toString(),
+                        )
+                    }
                 }
             }
         } catch (error: IOException) {
-            MerchantParserRequestResult.Failure("Could not reach server. Check your connection and try again.")
+            MerchantParserRequestResult.Failure(MerchantParserRequestResult.Failure.Reason.Unreachable)
         }
     }
 

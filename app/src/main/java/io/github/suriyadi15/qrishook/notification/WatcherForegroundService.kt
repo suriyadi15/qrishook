@@ -11,6 +11,7 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import io.github.suriyadi15.qrishook.AppGraph
+import io.github.suriyadi15.qrishook.AppLocale
 import io.github.suriyadi15.qrishook.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,6 +22,8 @@ import kotlinx.coroutines.launch
 
 class WatcherForegroundService : Service() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val localizedContext: Context
+        get() = AppLocale.localized(this)
 
     override fun onCreate() {
         super.onCreate()
@@ -57,8 +60,8 @@ class WatcherForegroundService : Service() {
     private fun buildNotification(): Notification {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher)
-            .setContentTitle("QRIS Hook is active")
-            .setContentText("QRIS Hook is monitoring notifications.")
+            .setContentTitle(localizedContext.getString(R.string.fg_title))
+            .setContentText(localizedContext.getString(R.string.fg_text))
             .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
@@ -70,10 +73,10 @@ class WatcherForegroundService : Service() {
 
         val channel = NotificationChannel(
             CHANNEL_ID,
-            "QRIS Hook Monitoring",
+            localizedContext.getString(R.string.fg_channel_name),
             NotificationManager.IMPORTANCE_LOW,
         ).apply {
-            description = "QRIS Hook background monitoring status"
+            description = localizedContext.getString(R.string.fg_channel_desc)
         }
 
         getSystemService(NotificationManager::class.java).createNotificationChannel(channel)

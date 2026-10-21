@@ -1,0 +1,187 @@
+<resources>
+    <string name="app_name">QRIS Hook</string>
+    <string name="notification_listener_label">Pemantauan QRIS Hook</string>
+
+    <!-- Foreground service -->
+    <string name="fg_title">QRIS Hook aktif</string>
+    <string name="fg_text">QRIS Hook sedang memantau notifikasi.</string>
+    <string name="fg_channel_name">Pemantauan QRIS Hook</string>
+    <string name="fg_channel_desc">Status pemantauan QRIS Hook di latar belakang</string>
+
+    <!-- Common -->
+    <string name="close">Tutup</string>
+    <string name="cancel">Batal</string>
+    <string name="copy">Salin</string>
+    <string name="done">Selesai</string>
+    <string name="save">Simpan</string>
+    <string name="delete">Hapus</string>
+    <string name="clear">Bersihkan</string>
+    <string name="send">Kirim</string>
+    <string name="sending">Mengirim...</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Beranda</string>
+    <string name="nav_history">Riwayat</string>
+    <string name="nav_debug">Debug</string>
+    <string name="subtitle_home">Notifikasi QRIS ke webhook</string>
+    <string name="subtitle_history">Event QRIS yang cocok</string>
+    <string name="subtitle_debug">Payload notifikasi mentah</string>
+
+    <!-- History -->
+    <string name="search_history">Cari riwayat</string>
+    <string name="history_loading">Memuat riwayat...</string>
+    <string name="history_error">Gagal memuat riwayat.</string>
+    <string name="history_empty">Belum ada event QRIS yang cocok.</string>
+    <string name="history_loading_more">Memuat riwayat lainnya...</string>
+    <string name="history_error_more">Gagal memuat riwayat lainnya.</string>
+
+    <!-- Debug -->
+    <string name="search_debug_logs">Cari log debug</string>
+    <string name="debug_loading">Memuat log debug...</string>
+    <string name="debug_error">Gagal memuat log debug.</string>
+    <string name="debug_empty">Belum ada payload debug.</string>
+    <string name="debug_loading_more">Memuat log debug lainnya...</string>
+    <string name="debug_error_more">Gagal memuat log debug lainnya.</string>
+    <string name="debug_mode_title">Mode Debug</string>
+    <string name="debug_mode_active_no_apps">Aktif, tetapi belum ada aplikasi yang dipilih.</string>
+    <string name="debug_mode_active">Aktif. Notifikasi dari aplikasi terpilih disimpan sebagai payload mentah.</string>
+    <string name="debug_mode_off">Nonaktif. QRIS Hook memproses notifikasi seperti biasa.</string>
+    <plurals name="apps_selected">
+        <item quantity="other">%1$d aplikasi dipilih</item>
+    </plurals>
+    <string name="select_apps">Pilih aplikasi</string>
+    <string name="search_apps">Cari aplikasi</string>
+    <string name="no_matching_apps">Tidak ada aplikasi yang cocok.</string>
+    <string name="debug_logs_title">Log Debug</string>
+
+    <!-- Merchant support request -->
+    <string name="request_support_title">Minta Dukungan Merchant</string>
+    <string name="request_support_p1">Agar merchant baru bisa didukung, permintaan harus menyertakan payload debug yang ditangkap oleh QRIS Hook. Payload ini kami gunakan untuk menambahkan dukungan aplikasi merchant tersebut.</string>
+    <string name="request_support_p2">Aktifkan Mode Debug, pilih aplikasi merchant, lakukan pembayaran QRIS asli atau uji coba, buka log debug yang tertangkap, lalu ketuk Minta dukungan merchant. Permintaan dikirim langsung dari aplikasi bersama detail aplikasi, package, payload, dan perangkat. Tidak perlu akun GitHub.</string>
+    <string name="request_support_p3">Samarkan data sensitif seperti nama pelanggan, nomor rekening, dan ID transaksi sebelum mengirim.</string>
+    <string name="request_dialog_title">Minta dukungan merchant</string>
+    <string name="request_sent">Permintaan terkirim sebagai #%1$d. Terima kasih sudah membantu QRIS Hook mendukung lebih banyak merchant.</string>
+    <string name="expected_details_label">Detail pembayaran yang diharapkan (opsional)</string>
+    <string name="expected_details_placeholder">Nominal, nama pengirim, sumber pembayaran, waktu diterima</string>
+    <string name="contact_label">Email atau WhatsApp (opsional)</string>
+    <string name="debug_payload_label">Payload debug</string>
+    <string name="payload_masked_hint">Angka panjang dan email sudah disamarkan. Ganti nama pelanggan dengan [NAME] sebelum mengirim.</string>
+    <string name="payload_invalid">Payload harus berupa JSON yang valid.</string>
+    <string name="request_consent">Saya sudah memeriksa dan mengedit payload. Saya setuju payload dikirim ke pengelola QRIS Hook dan ditangani sesuai Kebijakan Privasi.</string>
+    <string name="read_privacy">Baca Kebijakan Privasi</string>
+    <string name="request_support_button">Minta dukungan</string>
+    <string name="request_err_unexpected">Respons server tidak terduga</string>
+    <string name="request_err_http">Kesalahan server (HTTP %1$d)</string>
+    <string name="request_err_unreachable">Tidak dapat menghubungi server. Periksa koneksi Anda lalu coba lagi.</string>
+
+    <!-- Home: access, battery, active -->
+    <string name="access_title">Akses Notifikasi</string>
+    <string name="access_enabled">Aktif. QRIS Hook dapat membaca notifikasi.</string>
+    <string name="access_disabled">Belum aktif. Izinkan QRIS Hook di pengaturan Android.</string>
+    <string name="access_restricted_hint">Jika Android memblokirnya dengan pengaturan terbatas, buka Info Aplikasi, ketuk Lainnya, lalu Izinkan pengaturan terbatas.</string>
+    <string name="access_open">Buka akses</string>
+    <string name="access_enable">Aktifkan akses</string>
+    <string name="app_info">Info aplikasi</string>
+    <string name="battery_title">Baterai</string>
+    <string name="battery_unrestricted">Tanpa batasan. Android seharusnya tidak menghentikan QRIS Hook di latar belakang.</string>
+    <string name="battery_restricted">Dibatasi. Atur tanpa batasan agar pemantauan notifikasi tetap berjalan.</string>
+    <string name="battery_set">Sudah</string>
+    <string name="battery_allow">Izinkan</string>
+    <string name="active_title">QRIS Hook Aktif</string>
+    <string name="active_paused">Dijeda. Pengaturan merchant dan debug tetap tersimpan.</string>
+    <string name="active_waiting">Menunggu Akses Notifikasi.</string>
+    <string name="active_running">Aktif. QRIS Hook memantau notifikasi di latar belakang.</string>
+
+    <!-- Home: language, open source, version -->
+    <string name="language_title">Bahasa</string>
+    <string name="language_system">Ikuti sistem</string>
+    <string name="language_english">English</string>
+    <string name="language_indonesian">Bahasa Indonesia</string>
+    <string name="opensource_title">Open Source</string>
+    <string name="opensource_desc">Lihat kode sumber, laporkan masalah, atau kontribusi parser merchant di GitHub.</string>
+    <string name="github">GitHub</string>
+    <string name="version_title">Versi Aplikasi</string>
+    <string name="version_line">Versi %1$s (%2$d)</string>
+    <string name="update_idle">Status pembaruan belum diperiksa.</string>
+    <string name="update_loading">Memeriksa rilis GitHub terbaru...</string>
+    <string name="update_up_to_date">Anda memakai versi terbaru (%1$s).</string>
+    <string name="update_available">Versi %1$s tersedia.</string>
+    <string name="update_failed">Gagal memeriksa pembaruan: %1$s</string>
+    <string name="update_err_http">HTTP %1$d</string>
+    <string name="update_err_read">Tidak dapat membaca rilis terbaru.</string>
+    <string name="checking">Memeriksa...</string>
+    <string name="check_update">Cek pembaruan</string>
+    <string name="update">Perbarui</string>
+
+    <!-- Webhooks -->
+    <string name="webhook_title">Webhook</string>
+    <string name="webhook_empty">Belum ada webhook. Tambahkan URL server Anda untuk mulai menerima pembayaran QRIS.</string>
+    <string name="webhook_add">Tambah webhook</string>
+    <string name="webhook_retry">Kirim ulang</string>
+    <string name="webhook_default_chip">Default</string>
+    <string name="webhook_other_merchants">Merchant lainnya</string>
+    <string name="webhook_secret_set">Secret terisi</string>
+    <string name="webhook_testing">Menguji...</string>
+    <string name="webhook_test_ok">Tes berhasil (HTTP %1$d)</string>
+    <string name="webhook_test_fail">Tes gagal: %1$s</string>
+    <string name="webhook_unrouted_banner">Belum ada webhook untuk: %1$s. Pembayaran dari merchant ini tidak akan terkirim.</string>
+    <string name="webhook_unrouted_action">Atur</string>
+    <string name="webhook_sheet_add_title">Tambah webhook</string>
+    <string name="webhook_sheet_edit_title">Ubah webhook</string>
+    <string name="webhook_name_label">Nama</string>
+    <string name="webhook_name_placeholder">Mis. Server Toko A</string>
+    <string name="webhook_url_label">URL webhook</string>
+    <string name="webhook_url_placeholder">https://contoh.com/qris-webhook</string>
+    <string name="webhook_url_invalid">Masukkan URL http:// atau https:// yang valid.</string>
+    <string name="webhook_url_insecure">Tidak terenkripsi (http). Build rilis memblokir http, gunakan https.</string>
+    <string name="webhook_secret_label">Secret (opsional)</string>
+    <string name="webhook_secret_helper">Dikirim sebagai header X-Webhook-Secret.</string>
+    <string name="webhook_secret_show">Tampilkan</string>
+    <string name="webhook_secret_hide">Sembunyikan</string>
+    <string name="webhook_secret_generate">Buat acak</string>
+    <string name="webhook_merchants_title">Merchant yang dikirim ke webhook ini</string>
+    <string name="webhook_merchant_currently">saat ini: %1$s</string>
+    <string name="webhook_default_switch">Jadikan webhook default</string>
+    <string name="webhook_default_helper">Dipakai untuk merchant yang tidak dipilih di webhook mana pun.</string>
+    <string name="webhook_send_test">Kirim tes</string>
+    <string name="webhook_delete_title">Hapus webhook?</string>
+    <string name="webhook_delete_message">\"%1$s\" akan dihapus.</string>
+    <string name="webhook_delete_affected">Merchant yang akan memakai webhook default atau tidak punya tujuan: %1$s</string>
+
+    <!-- Merchants -->
+    <string name="merchant_title">Merchant</string>
+    <string name="merchant_dest">→ %1$s</string>
+    <string name="merchant_dest_default">→ %1$s (default)</string>
+    <string name="merchant_dest_none">⚠ Belum ada webhook</string>
+
+    <!-- Delivery status -->
+    <string name="status_pending">Menunggu</string>
+    <string name="status_sending">Mengirim</string>
+    <string name="status_sent">Terkirim</string>
+    <string name="status_failed">Gagal</string>
+
+    <!-- Event detail -->
+    <string name="detail_payment">Pembayaran</string>
+    <string name="detail_amount">Nominal</string>
+    <string name="detail_merchant">Merchant</string>
+    <string name="detail_sender">Pengirim</string>
+    <string name="detail_source">Sumber</string>
+    <string name="detail_received">Diterima</string>
+    <string name="detail_delivery">Pengiriman</string>
+    <string name="detail_status">Status</string>
+    <string name="detail_attempts">Percobaan</string>
+    <string name="detail_last_error">Error terakhir</string>
+    <string name="detail_last_attempt">Percobaan webhook terakhir</string>
+    <string name="detail_webhook_target">Tujuan webhook</string>
+    <string name="detail_updated">Diperbarui</string>
+    <string name="detail_webhook_response">Respons webhook</string>
+    <string name="detail_code">Kode</string>
+    <string name="detail_message">Pesan</string>
+    <string name="detail_body">Isi</string>
+    <string name="detail_notification">Notifikasi</string>
+    <string name="detail_package">Package</string>
+    <string name="detail_title">Judul</string>
+    <string name="detail_text">Teks</string>
+    <string name="detail_big_text">Teks panjang</string>
+    <string name="detail_webhook_payload">Payload webhook</string>
+</resources>

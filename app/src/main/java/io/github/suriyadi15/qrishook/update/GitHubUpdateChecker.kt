@@ -22,11 +22,11 @@ class GitHubUpdateChecker(
             client.newCall(request).execute().use { response ->
                 val body = response.body?.string().orEmpty()
                 if (!response.isSuccessful) {
-                    return AppUpdateState.Error("Failed to check update: HTTP ${response.code}")
+                    return AppUpdateState.Error(AppUpdateState.Error.Reason.Http, response.code.toString())
                 }
 
                 val release = parseRelease(body)
-                    ?: return AppUpdateState.Error("Failed to read latest release.")
+                    ?: return AppUpdateState.Error(AppUpdateState.Error.Reason.Unreadable)
 
                 if (AppVersion.compare(release.version, currentVersion) > 0) {
                     AppUpdateState.UpdateAvailable(
@@ -38,7 +38,10 @@ class GitHubUpdateChecker(
                 }
             }
         }.getOrElse { error ->
-            AppUpdateState.Error(error.message ?: error::class.java.simpleName)
+            AppUpdateState.Error(
+                AppUpdateState.Error.Reason.Other,
+                error.message ?: error::class.java.simpleName,
+            )
         }
     }
 

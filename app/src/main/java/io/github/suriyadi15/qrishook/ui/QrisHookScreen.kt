@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -28,6 +27,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -43,7 +43,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,22 +50,29 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.core.os.LocaleListCompat
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import io.github.suriyadi15.qrishook.InstalledAppInfo
 import io.github.suriyadi15.qrishook.MainUiState
+import io.github.suriyadi15.qrishook.R
 import io.github.suriyadi15.qrishook.ParserRequestState
 import io.github.suriyadi15.qrishook.data.AppSettings
 import io.github.suriyadi15.qrishook.data.DebugNotificationEntity
 import io.github.suriyadi15.qrishook.data.EventEntity
+import io.github.suriyadi15.qrishook.data.WebhookEndpoint
+import io.github.suriyadi15.qrishook.domain.DeliveryStatus
+import io.github.suriyadi15.qrishook.issue.MerchantParserRequestResult
 import io.github.suriyadi15.qrishook.issue.PayloadRedactor
-import io.github.suriyadi15.qrishook.merchant.MerchantRegistry
 import io.github.suriyadi15.qrishook.update.AppUpdateState
 import io.github.suriyadi15.qrishook.webhook.WebhookPayloadBuilder
 import org.json.JSONObject
@@ -93,6 +99,7 @@ fun QrisHookScreen(
     onCheckForUpdates: () -> Unit,
     onOpenUpdate: (String) -> Unit,
     onTestDelivery: () -> Unit,
+    onTestWebhook: (WebhookEndpoint) -> Unit,
     onClearDebugLogs: () -> Unit,
 ) {
     var selectedDestination by rememberSaveable { mutableStateOf(MainDestination.Home) }
@@ -105,9 +112,9 @@ fun QrisHookScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text("QRIS Hook", fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.app_name), fontWeight = FontWeight.SemiBold)
                         Text(
-                            selectedDestination.subtitle,
+                            stringResource(selectedDestination.subtitleRes),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.secondary,
                         )
@@ -127,10 +134,10 @@ fun QrisHookScreen(
                         icon = {
                             Icon(
                                 imageVector = destination.icon,
-                                contentDescription = destination.label,
+                                contentDescription = stringResource(destination.labelRes),
                             )
                         },
-                        label = { Text(destination.label) },
+                        label = { Text(stringResource(destination.labelRes)) },
                     )
                 }
             }
@@ -148,6 +155,7 @@ fun QrisHookScreen(
                 onCheckForUpdates = onCheckForUpdates,
                 onOpenUpdate = onOpenUpdate,
                 onTestDelivery = onTestDelivery,
+                onTestWebhook = onTestWebhook,
             )
 
             MainDestination.History -> HistoryScreen(
@@ -204,23 +212,23 @@ fun QrisHookScreen(
 }
 
 private enum class MainDestination(
-    val label: String,
-    val subtitle: String,
+    @StringRes val labelRes: Int,
+    @StringRes val subtitleRes: Int,
     val icon: ImageVector,
 ) {
     Home(
-        label = "Home",
-        subtitle = "QRIS notification to webhook",
+        labelRes = R.string.nav_home,
+        subtitleRes = R.string.subtitle_home,
         icon = Icons.Filled.Home,
     ),
     History(
-        label = "History",
-        subtitle = "Matched QRIS events",
+        labelRes = R.string.nav_history,
+        subtitleRes = R.string.subtitle_history,
         icon = Icons.Filled.Search,
     ),
     Debug(
-        label = "Debug",
-        subtitle = "Raw notification payloads",
+        labelRes = R.string.nav_debug,
+        subtitleRes = R.string.subtitle_debug,
         icon = Icons.Filled.Settings,
     ),
 }
@@ -237,7 +245,10 @@ private fun HomeScreen(
     onCheckForUpdates: () -> Unit,
     onOpenUpdate: (String) -> Unit,
     onTestDelivery: () -> Unit,
+    onTestWebhook: (WebhookEndpoint) -> Unit,
 ) {
+    var editorTarget by remember { mutableStateOf<WebhookEditorTarget?>(null) }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -268,15 +279,21 @@ private fun HomeScreen(
         item {
             WebhookSection(
                 settings = state.settings,
-                onSettingsChange = onSettingsChange,
-                onTestDelivery = onTestDelivery,
+                tests = state.webhookTests,
+                onAddWebhook = { editorTarget = WebhookEditorTarget.forNew() },
+                onEditWebhook = { editorTarget = WebhookEditorTarget.forId(state.settings, it) },
+                onRetryPending = onTestDelivery,
             )
         }
         item {
             MerchantSection(
                 settings = state.settings,
                 onSettingsChange = onSettingsChange,
+                onEditWebhook = { editorTarget = WebhookEditorTarget.forId(state.settings, it) },
             )
+        }
+        item {
+            LanguageSection()
         }
         item {
             OpenSourceSection(onOpenGitHub = onOpenGitHub)
@@ -290,6 +307,17 @@ private fun HomeScreen(
                 onOpenUpdate = onOpenUpdate,
             )
         }
+    }
+
+    editorTarget?.let { target ->
+        WebhookEditorSheet(
+            settings = state.settings,
+            target = target,
+            testState = state.webhookTests[target.endpoint.id],
+            onSettingsChange = onSettingsChange,
+            onTest = onTestWebhook,
+            onDismiss = { editorTarget = null },
+        )
     }
 }
 
@@ -312,21 +340,21 @@ private fun HistoryScreen(
             SearchField(
                 value = searchQuery,
                 onValueChange = onSearchChange,
-                label = "Search history",
+                label = stringResource(R.string.search_history),
             )
         }
 
         when {
             events.loadState.refresh is LoadState.Loading -> {
-                item { EmptyState("Loading history...") }
+                item { EmptyState(stringResource(R.string.history_loading)) }
             }
 
             events.loadState.refresh is LoadState.Error -> {
-                item { EmptyState("Failed to load history.") }
+                item { EmptyState(stringResource(R.string.history_error)) }
             }
 
             events.itemCount == 0 -> {
-                item { EmptyState("No matching QRIS events yet.") }
+                item { EmptyState(stringResource(R.string.history_empty)) }
             }
 
             else -> {
@@ -347,8 +375,8 @@ private fun HistoryScreen(
         item {
             AppendState(
                 loadState = events.loadState.append,
-                loadingText = "Loading more history...",
-                errorText = "Failed to load more history.",
+                loadingText = stringResource(R.string.history_loading_more),
+                errorText = stringResource(R.string.history_error_more),
             )
         }
     }
@@ -392,21 +420,21 @@ private fun DebugModeScreen(
             SearchField(
                 value = state.debugSearchQuery,
                 onValueChange = onSearchChange,
-                label = "Search debug logs",
+                label = stringResource(R.string.search_debug_logs),
             )
         }
 
         when {
             debugLogs.loadState.refresh is LoadState.Loading -> {
-                item { EmptyState("Loading debug logs...") }
+                item { EmptyState(stringResource(R.string.debug_loading)) }
             }
 
             debugLogs.loadState.refresh is LoadState.Error -> {
-                item { EmptyState("Failed to load debug logs.") }
+                item { EmptyState(stringResource(R.string.debug_error)) }
             }
 
             debugLogs.itemCount == 0 -> {
-                item { EmptyState("No debug payloads yet.") }
+                item { EmptyState(stringResource(R.string.debug_empty)) }
             }
 
             else -> {
@@ -427,8 +455,8 @@ private fun DebugModeScreen(
         item {
             AppendState(
                 loadState = debugLogs.loadState.append,
-                loadingText = "Loading more debug logs...",
-                errorText = "Failed to load more debug logs.",
+                loadingText = stringResource(R.string.debug_loading_more),
+                errorText = stringResource(R.string.debug_error_more),
             )
         }
     }
@@ -480,18 +508,17 @@ private fun AccessSection(
     onOpenAppInfo: () -> Unit,
 ) {
     Section {
-        Text("Notification Access", fontWeight = FontWeight.SemiBold)
+        Text(stringResource(R.string.access_title), fontWeight = FontWeight.SemiBold)
         Spacer(Modifier.height(4.dp))
         Text(
-            if (granted) "Enabled. QRIS Hook can read notifications."
-            else "Not enabled. Allow QRIS Hook in Android settings.",
+            stringResource(if (granted) R.string.access_enabled else R.string.access_disabled),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.secondary,
         )
         if (!granted) {
             Spacer(Modifier.height(8.dp))
             Text(
-                "If Android blocks this with restricted settings, open App Info, tap More, then Allow restricted settings.",
+                stringResource(R.string.access_restricted_hint),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.secondary,
             )
@@ -502,10 +529,10 @@ private fun AccessSection(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Button(onClick = onOpenNotificationAccess) {
-                Text(if (granted) "Open access" else "Enable access")
+                Text(stringResource(if (granted) R.string.access_open else R.string.access_enable))
             }
             OutlinedButton(onClick = onOpenAppInfo) {
-                Text("App info")
+                Text(stringResource(R.string.app_info))
             }
         }
     }
@@ -527,13 +554,11 @@ private fun BatteryOptimizationSection(
                     .weight(1f)
                     .padding(end = 12.dp),
             ) {
-                Text("Battery", fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.battery_title), fontWeight = FontWeight.SemiBold)
                 Text(
-                    if (ignoringBatteryOptimizations) {
-                        "No restrictions. Android should not stop QRIS Hook in the background."
-                    } else {
-                        "Restricted. Set no restrictions so notification monitoring keeps running."
-                    },
+                    stringResource(
+                        if (ignoringBatteryOptimizations) R.string.battery_unrestricted else R.string.battery_restricted,
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.secondary,
                 )
@@ -542,7 +567,7 @@ private fun BatteryOptimizationSection(
                 enabled = !ignoringBatteryOptimizations,
                 onClick = onRequestIgnoreBatteryOptimizations,
             ) {
-                Text(if (ignoringBatteryOptimizations) "Set" else "Allow")
+                Text(stringResource(if (ignoringBatteryOptimizations) R.string.battery_set else R.string.battery_allow))
             }
         }
     }
@@ -561,13 +586,15 @@ private fun QrisHookActiveSection(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text("QRIS Hook Active", fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.active_title), fontWeight = FontWeight.SemiBold)
                 Text(
-                    when {
-                        !settings.qrisHookActive -> "Paused. Merchant and debug settings stay saved."
-                        !notificationAccessGranted -> "Waiting for Notification Access."
-                        else -> "Active. QRIS Hook is monitoring notifications in the background."
-                    },
+                    stringResource(
+                        when {
+                            !settings.qrisHookActive -> R.string.active_paused
+                            !notificationAccessGranted -> R.string.active_waiting
+                            else -> R.string.active_running
+                        },
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.secondary,
                 )
@@ -579,83 +606,6 @@ private fun QrisHookActiveSection(
                 },
             )
         }
-    }
-}
-
-@Composable
-private fun WebhookSection(
-    settings: AppSettings,
-    onSettingsChange: (AppSettings) -> Unit,
-    onTestDelivery: () -> Unit,
-) {
-    var webhookUrl by rememberSaveable { mutableStateOf(settings.webhookUrl) }
-    var secret by rememberSaveable { mutableStateOf(settings.secret) }
-
-    LaunchedEffect(settings.webhookUrl, settings.secret) {
-        webhookUrl = settings.webhookUrl
-        secret = settings.secret
-    }
-
-    val hasUnsavedChanges = webhookUrl != settings.webhookUrl || secret != settings.secret
-
-    Section {
-        Text("Webhook", fontWeight = FontWeight.SemiBold)
-        Spacer(Modifier.height(8.dp))
-        OutlinedTextField(
-            value = webhookUrl,
-            onValueChange = { webhookUrl = it },
-            label = { Text("Webhook URL") },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
-            modifier = Modifier.fillMaxWidth(),
-        )
-        Spacer(Modifier.height(8.dp))
-        OutlinedTextField(
-            value = secret,
-            onValueChange = { secret = it },
-            label = { Text("Optional secret") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-        )
-        Spacer(Modifier.height(8.dp))
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Button(
-                enabled = hasUnsavedChanges,
-                onClick = {
-                    onSettingsChange(
-                        settings.copy(
-                            webhookUrl = webhookUrl,
-                            secret = secret,
-                        ),
-                    )
-                },
-            ) {
-                Text("Save")
-            }
-            OutlinedButton(onClick = onTestDelivery) {
-                Text("Retry pending")
-            }
-        }
-    }
-}
-
-@Composable
-private fun MerchantSection(
-    settings: AppSettings,
-    onSettingsChange: (AppSettings) -> Unit,
-) {
-    Section {
-        Text("Merchant", fontWeight = FontWeight.SemiBold)
-        Spacer(Modifier.height(8.dp))
-        MerchantPicker(
-            selectedMerchantIds = settings.selectedMerchantIds,
-            onSelectedMerchantIdsChange = {
-                onSettingsChange(settings.copy(selectedMerchantIds = it))
-            },
-        )
     }
 }
 
@@ -674,15 +624,15 @@ private fun OpenSourceSection(
                     .weight(1f)
                     .padding(end = 12.dp),
             ) {
-                Text("Open Source", fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.opensource_title), fontWeight = FontWeight.SemiBold)
                 Text(
-                    "View the source code, report issues, or contribute merchant parsers on GitHub.",
+                    stringResource(R.string.opensource_desc),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.secondary,
                 )
             }
             OutlinedButton(onClick = onOpenGitHub) {
-                Text("GitHub")
+                Text(stringResource(R.string.github))
             }
         }
     }
@@ -697,10 +647,10 @@ private fun AppVersionSection(
     onOpenUpdate: (String) -> Unit,
 ) {
     Section {
-        Text("App Version", fontWeight = FontWeight.SemiBold)
+        Text(stringResource(R.string.version_title), fontWeight = FontWeight.SemiBold)
         Spacer(Modifier.height(4.dp))
         Text(
-            "Version $versionName ($versionCode)",
+            stringResource(R.string.version_line, versionName, versionCode),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.secondary,
         )
@@ -719,25 +669,93 @@ private fun AppVersionSection(
                 enabled = updateState !is AppUpdateState.Loading,
                 onClick = onCheckForUpdates,
             ) {
-                Text(if (updateState is AppUpdateState.Loading) "Checking..." else "Check update")
+                Text(stringResource(if (updateState is AppUpdateState.Loading) R.string.checking else R.string.check_update))
             }
 
             if (updateState is AppUpdateState.UpdateAvailable) {
                 Button(onClick = { onOpenUpdate(updateState.downloadUrl) }) {
-                    Text("Update")
+                    Text(stringResource(R.string.update))
                 }
             }
         }
     }
 }
 
+@Composable
 private fun updateStateText(updateState: AppUpdateState): String {
     return when (updateState) {
-        AppUpdateState.Idle -> "Update status has not been checked yet."
-        AppUpdateState.Loading -> "Checking latest GitHub release..."
-        is AppUpdateState.UpToDate -> "You are using the latest version (${updateState.latestVersion})."
-        is AppUpdateState.UpdateAvailable -> "Version ${updateState.latestVersion} is available."
-        is AppUpdateState.Error -> "Update check failed: ${updateState.message}"
+        AppUpdateState.Idle -> stringResource(R.string.update_idle)
+        AppUpdateState.Loading -> stringResource(R.string.update_loading)
+        is AppUpdateState.UpToDate -> stringResource(R.string.update_up_to_date, updateState.latestVersion)
+        is AppUpdateState.UpdateAvailable -> stringResource(R.string.update_available, updateState.latestVersion)
+        is AppUpdateState.Error -> {
+            val detail = when (updateState.reason) {
+                AppUpdateState.Error.Reason.Http ->
+                    stringResource(R.string.update_err_http, updateState.detail.toIntOrNull() ?: 0)
+                AppUpdateState.Error.Reason.Unreadable -> stringResource(R.string.update_err_read)
+                AppUpdateState.Error.Reason.Other -> updateState.detail
+            }
+            stringResource(R.string.update_failed, detail)
+        }
+    }
+}
+
+@Composable
+private fun parserRequestErrorText(failure: MerchantParserRequestResult.Failure): String {
+    return when (failure.reason) {
+        MerchantParserRequestResult.Failure.Reason.UnexpectedResponse ->
+            stringResource(R.string.request_err_unexpected)
+        MerchantParserRequestResult.Failure.Reason.ServerMessage -> failure.detail
+        MerchantParserRequestResult.Failure.Reason.ServerHttp ->
+            stringResource(R.string.request_err_http, failure.detail.toIntOrNull() ?: 0)
+        MerchantParserRequestResult.Failure.Reason.Unreachable ->
+            stringResource(R.string.request_err_unreachable)
+    }
+}
+
+@Composable
+private fun LanguageSection() {
+    // AppCompat stores and restores the choice; "" means follow the system language.
+    var selected by remember { mutableStateOf(currentLanguageTag()) }
+    val options = listOf(
+        "" to R.string.language_system,
+        "en" to R.string.language_english,
+        "id" to R.string.language_indonesian,
+    )
+
+    Section {
+        Text(stringResource(R.string.language_title), fontWeight = FontWeight.SemiBold)
+        Spacer(Modifier.height(4.dp))
+        options.forEach { (tag, labelRes) ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        selected = tag
+                        AppCompatDelegate.setApplicationLocales(
+                            if (tag.isEmpty()) {
+                                LocaleListCompat.getEmptyLocaleList()
+                            } else {
+                                LocaleListCompat.forLanguageTags(tag)
+                            },
+                        )
+                    },
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                RadioButton(selected = selected == tag, onClick = null)
+                Spacer(Modifier.width(12.dp))
+                Text(stringResource(labelRes), modifier = Modifier.padding(vertical = 10.dp))
+            }
+        }
+    }
+}
+
+private fun currentLanguageTag(): String {
+    val tag = AppCompatDelegate.getApplicationLocales().toLanguageTags()
+    return when {
+        tag.startsWith("id") || tag.startsWith("in") -> "id"
+        tag.startsWith("en") -> "en"
+        else -> ""
     }
 }
 
@@ -754,17 +772,15 @@ private fun DebugSettingsSection(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text("Debug Mode", fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.debug_mode_title), fontWeight = FontWeight.SemiBold)
                 Text(
-                    if (settings.debugModeEnabled) {
-                        if (settings.debugWatchedPackages.isEmpty()) {
-                            "Active, but no apps are selected."
-                        } else {
-                            "Active. Selected notifications are saved as raw payloads."
-                        }
-                    } else {
-                        "Off. QRIS Hook processes notifications normally."
-                    },
+                    stringResource(
+                        when {
+                            !settings.debugModeEnabled -> R.string.debug_mode_off
+                            settings.debugWatchedPackages.isEmpty() -> R.string.debug_mode_active_no_apps
+                            else -> R.string.debug_mode_active
+                        },
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.secondary,
                 )
@@ -780,13 +796,17 @@ private fun DebugSettingsSection(
         if (settings.debugModeEnabled) {
             Spacer(Modifier.height(12.dp))
             Text(
-                "${settings.debugWatchedPackages.size} apps selected",
+                pluralStringResource(
+                    R.plurals.apps_selected,
+                    settings.debugWatchedPackages.size,
+                    settings.debugWatchedPackages.size,
+                ),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.secondary,
             )
             Spacer(Modifier.height(8.dp))
             OutlinedButton(onClick = onPickApps) {
-                Text("Select apps")
+                Text(stringResource(R.string.select_apps))
             }
         }
     }
@@ -795,22 +815,22 @@ private fun DebugSettingsSection(
 @Composable
 private fun MerchantParserContributionSection() {
     Section {
-        Text("Request Merchant Support", fontWeight = FontWeight.SemiBold)
+        Text(stringResource(R.string.request_support_title), fontWeight = FontWeight.SemiBold)
         Spacer(Modifier.height(8.dp))
         Text(
-            "To get a new merchant supported, the request must include a debug payload captured by QRIS Hook. We use it to add support for that merchant app.",
+            stringResource(R.string.request_support_p1),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.secondary,
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            "Turn on Debug Mode, select the merchant app, make a real or test QRIS payment, open the captured debug log, then tap Request merchant support. The request is sent directly from the app, together with the app, package, payload, and device details. No GitHub account is needed.",
+            stringResource(R.string.request_support_p2),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.secondary,
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            "Redact sensitive data such as customer names, account numbers, and transaction IDs before submitting.",
+            stringResource(R.string.request_support_p3),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.secondary,
         )
@@ -828,9 +848,9 @@ private fun DebugLogHeader(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text("Debug Logs", fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.debug_logs_title), fontWeight = FontWeight.SemiBold)
                 Text(
-                    "Raw notification payloads",
+                    stringResource(R.string.subtitle_debug),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.secondary,
                 )
@@ -838,7 +858,7 @@ private fun DebugLogHeader(
             OutlinedButton(
                 onClick = onClearDebugLogs,
             ) {
-                Text("Clear")
+                Text(stringResource(R.string.clear))
             }
         }
     }
@@ -866,25 +886,29 @@ private fun AppPickerDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Select apps") },
+        title = { Text(stringResource(R.string.select_apps)) },
         text = {
             Column {
                 OutlinedTextField(
                     value = appSearch,
                     onValueChange = { appSearch = it },
-                    label = { Text("Search apps") },
+                    label = { Text(stringResource(R.string.search_apps)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "${selectedPackages.size} apps selected",
+                    pluralStringResource(
+                        R.plurals.apps_selected,
+                        selectedPackages.size,
+                        selectedPackages.size,
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.secondary,
                 )
                 Spacer(Modifier.height(8.dp))
                 if (filteredApps.isEmpty()) {
-                    EmptyState("No matching apps.")
+                    EmptyState(stringResource(R.string.no_matching_apps))
                 } else {
                     LazyColumn(
                         modifier = Modifier
@@ -912,7 +936,7 @@ private fun AppPickerDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Done")
+                Text(stringResource(R.string.done))
             }
         },
     )
@@ -941,45 +965,6 @@ private fun AppPickerRow(
             checked = checked,
             onCheckedChange = onCheckedChange,
         )
-    }
-}
-
-@Composable
-private fun MerchantPicker(
-    selectedMerchantIds: Set<String>,
-    onSelectedMerchantIdsChange: (Set<String>) -> Unit,
-) {
-    val parsers = MerchantRegistry.builtInParsers
-
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        parsers.forEach { parser ->
-            val checked = parser.merchantId in selectedMerchantIds
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(parser.displayName, fontWeight = FontWeight.Medium)
-                    Text(
-                        parser.merchantPackages.joinToString(),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.secondary,
-                    )
-                }
-                Checkbox(
-                    checked = checked,
-                    onCheckedChange = { isChecked ->
-                        val next = if (isChecked) {
-                            selectedMerchantIds + parser.merchantId
-                        } else {
-                            selectedMerchantIds - parser.merchantId
-                        }
-                        onSelectedMerchantIdsChange(next)
-                    },
-                )
-            }
-        }
     }
 }
 
@@ -1028,14 +1013,14 @@ private fun MerchantRequestDialog(
 
     AlertDialog(
         onDismissRequest = { if (!sending) onDismiss() },
-        title = { Text("Request merchant support") },
+        title = { Text(stringResource(R.string.request_dialog_title)) },
         text = {
             Column(
                 modifier = Modifier.verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 if (state is ParserRequestState.Sent) {
-                    Text("Request sent as #${state.id}. Thank you for helping QRIS Hook support more merchants.")
+                    Text(stringResource(R.string.request_sent, state.id))
                 } else {
                     Text(log.sourceApp, fontWeight = FontWeight.Medium)
                     Text(
@@ -1047,8 +1032,8 @@ private fun MerchantRequestDialog(
                         value = expectedDetails,
                         onValueChange = { expectedDetails = it },
                         enabled = !sending,
-                        label = { Text("Expected payment details (optional)") },
-                        placeholder = { Text("Amount, sender name, payment source, received time") },
+                        label = { Text(stringResource(R.string.expected_details_label)) },
+                        placeholder = { Text(stringResource(R.string.expected_details_placeholder)) },
                         minLines = 3,
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -1056,7 +1041,7 @@ private fun MerchantRequestDialog(
                         value = contact,
                         onValueChange = { contact = it },
                         enabled = !sending,
-                        label = { Text("Email or WhatsApp (optional)") },
+                        label = { Text(stringResource(R.string.contact_label)) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -1064,15 +1049,13 @@ private fun MerchantRequestDialog(
                         value = payload,
                         onValueChange = { payload = it },
                         enabled = !sending,
-                        label = { Text("Debug payload") },
+                        label = { Text(stringResource(R.string.debug_payload_label)) },
                         isError = !payloadValid,
                         supportingText = {
                             Text(
-                                if (payloadValid) {
-                                    "Long numbers and emails were masked. Replace any customer names with [NAME] before sending."
-                                } else {
-                                    "Payload must be valid JSON."
-                                },
+                                stringResource(
+                                    if (payloadValid) R.string.payload_masked_hint else R.string.payload_invalid,
+                                ),
                             )
                         },
                         textStyle = MaterialTheme.typography.bodySmall,
@@ -1086,16 +1069,16 @@ private fun MerchantRequestDialog(
                         Checkbox(checked = confirmed, onCheckedChange = null, enabled = !sending)
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            "I reviewed and edited the payload. I agree it is sent to the QRIS Hook maintainer and handled as described in the Privacy Policy.",
+                            stringResource(R.string.request_consent),
                             style = MaterialTheme.typography.bodySmall,
                         )
                     }
                     TextButton(onClick = { uriHandler.openUri(PRIVACY_POLICY_URL) }) {
-                        Text("Read Privacy Policy")
+                        Text(stringResource(R.string.read_privacy))
                     }
                     if (state is ParserRequestState.Error) {
                         Text(
-                            state.message,
+                            parserRequestErrorText(state.failure),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.error,
                         )
@@ -1105,19 +1088,19 @@ private fun MerchantRequestDialog(
         },
         confirmButton = {
             if (sent) {
-                TextButton(onClick = onDismiss) { Text("Tutup") }
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.close)) }
             } else {
                 TextButton(
                     onClick = { onSubmit(expectedDetails, contact, payload) },
                     enabled = confirmed && payloadValid && !sending,
                 ) {
-                    Text(if (sending) "Sending..." else "Send")
+                    Text(stringResource(if (sending) R.string.sending else R.string.send))
                 }
             }
         },
         dismissButton = {
             if (!sent) {
-                TextButton(onClick = onDismiss, enabled = !sending) { Text("Batal") }
+                TextButton(onClick = onDismiss, enabled = !sending) { Text(stringResource(R.string.cancel)) }
             }
         },
     )
@@ -1146,7 +1129,7 @@ private fun DebugPayloadDialog(
         confirmButton = {
             Row {
                 TextButton(onClick = onRequestParser) {
-                    Text("Request support")
+                    Text(stringResource(R.string.request_support_button))
                 }
                 TextButton(
                     onClick = {
@@ -1157,13 +1140,13 @@ private fun DebugPayloadDialog(
                         )
                     },
                 ) {
-                    Text("Copy")
+                    Text(stringResource(R.string.copy))
                 }
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Tutup")
+                Text(stringResource(R.string.close))
             }
         },
     )
@@ -1232,39 +1215,40 @@ private fun EventDetailDialog(
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                DetailSection("Payment") {
-                    DetailLine("Amount", "Rp${event.amount}")
-                    DetailLine("Merchant", event.merchantId)
-                    DetailLine("Sender", event.senderName.orEmpty().ifBlank { "-" })
-                    DetailLine("Source", event.paymentSource.orEmpty().ifBlank { "-" })
-                    DetailLine("Received", event.receivedAt)
+                DetailSection(stringResource(R.string.detail_payment)) {
+                    DetailLine(stringResource(R.string.detail_amount), "Rp${event.amount}")
+                    DetailLine(stringResource(R.string.detail_merchant), event.merchantId)
+                    DetailLine(stringResource(R.string.detail_sender), event.senderName.orEmpty().ifBlank { "-" })
+                    DetailLine(stringResource(R.string.detail_source), event.paymentSource.orEmpty().ifBlank { "-" })
+                    DetailLine(stringResource(R.string.detail_received), event.receivedAt)
                 }
 
-                DetailSection("Delivery") {
-                    DetailLine("Status", event.status.name)
-                    DetailLine("Attempts", event.attempts.toString())
-                    DetailLine("Last error", event.lastError.ifBlank { "-" })
+                DetailSection(stringResource(R.string.detail_delivery)) {
+                    DetailLine(stringResource(R.string.detail_status), event.status.label())
+                    DetailLine(stringResource(R.string.detail_attempts), event.attempts.toString())
+                    DetailLine(stringResource(R.string.detail_last_error), event.lastError.ifBlank { "-" })
                     DetailLine(
-                        "Last webhook attempt",
+                        stringResource(R.string.detail_last_attempt),
                         event.lastWebhookAttemptAtMillis?.let(::formatMillis) ?: "-",
                     )
-                    DetailLine("Updated", formatMillis(event.updatedAtMillis))
+                    DetailLine(stringResource(R.string.detail_updated), formatMillis(event.updatedAtMillis))
                 }
 
-                DetailSection("Webhook response") {
-                    DetailLine("Code", event.lastResponseCode?.toString() ?: "-")
-                    DetailLine("Message", event.lastResponseMessage.ifBlank { "-" })
-                    DetailBlock("Body", event.lastResponseBody.ifBlank { "-" })
+                DetailSection(stringResource(R.string.detail_webhook_response)) {
+                    DetailLine(stringResource(R.string.detail_webhook_target), event.lastWebhookUrl.ifBlank { "-" })
+                    DetailLine(stringResource(R.string.detail_code), event.lastResponseCode?.toString() ?: "-")
+                    DetailLine(stringResource(R.string.detail_message), event.lastResponseMessage.ifBlank { "-" })
+                    DetailBlock(stringResource(R.string.detail_body), event.lastResponseBody.ifBlank { "-" })
                 }
 
-                DetailSection("Notification") {
-                    DetailLine("Package", event.sourcePackage)
-                    DetailLine("Title", event.title.ifBlank { "-" })
-                    DetailBlock("Text", event.text.ifBlank { "-" })
-                    DetailBlock("Big text", event.bigText.ifBlank { "-" })
+                DetailSection(stringResource(R.string.detail_notification)) {
+                    DetailLine(stringResource(R.string.detail_package), event.sourcePackage)
+                    DetailLine(stringResource(R.string.detail_title), event.title.ifBlank { "-" })
+                    DetailBlock(stringResource(R.string.detail_text), event.text.ifBlank { "-" })
+                    DetailBlock(stringResource(R.string.detail_big_text), event.bigText.ifBlank { "-" })
                 }
 
-                DetailSection("Webhook payload") {
+                DetailSection(stringResource(R.string.detail_webhook_payload)) {
                     DetailBlock("JSON", WebhookPayloadBuilder.build(event))
                 }
             }
@@ -1279,12 +1263,12 @@ private fun EventDetailDialog(
                     )
                 },
             ) {
-                Text("Copy")
+                Text(stringResource(R.string.copy))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Tutup")
+                Text(stringResource(R.string.close))
             }
         },
     )
@@ -1321,8 +1305,22 @@ private fun DetailBlock(label: String, value: String) {
     DetailLine(label, value)
 }
 
+@Composable
+private fun DeliveryStatus.label(): String {
+    return stringResource(
+        when (this) {
+            DeliveryStatus.Pending -> R.string.status_pending
+            DeliveryStatus.Sending -> R.string.status_sending
+            DeliveryStatus.Sent -> R.string.status_sent
+            DeliveryStatus.Failed -> R.string.status_failed
+        },
+    )
+}
+
+@Composable
 private fun EventEntity.deliverySummary(): String {
-    return lastResponseCode?.let { "${status.name} $it" } ?: status.name
+    val label = status.label()
+    return lastResponseCode?.let { "$label $it" } ?: label
 }
 
 private fun formatMillis(millis: Long): String {
@@ -1452,7 +1450,7 @@ private fun EmptyState(text: String) {
 }
 
 @Composable
-private fun Section(
+internal fun Section(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {

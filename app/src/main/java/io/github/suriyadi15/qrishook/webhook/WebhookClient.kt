@@ -2,6 +2,7 @@ package io.github.suriyadi15.qrishook.webhook
 
 import io.github.suriyadi15.qrishook.data.AppSettings
 import io.github.suriyadi15.qrishook.data.EventEntity
+import io.github.suriyadi15.qrishook.data.WebhookEndpoint
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -17,26 +18,50 @@ class WebhookClient : WebhookSender {
         .build()
 
     override fun send(event: EventEntity, settings: AppSettings): WebhookResult {
-        if (settings.webhookUrl.isBlank()) {
+        val endpoint = settings.webhookFor(event.merchantId)
+            ?: return WebhookResult.Failure(
+                reason = "No webhook configured for merchant ${event.merchantId}",
+                code = null,
+                message = "",
+                body = "",
+            )
+
+        return post(endpoint, WebhookPayloadBuilder.build(event))
+    }
+
+    fun sendTest(endpoint: WebhookEndpoint): WebhookResult {
+        return post(endpoint, WebhookPayloadBuilder.build(WebhookTestEvent.create()))
+    }
+
+    private fun post(endpoint: WebhookEndpoint, payload: String): WebhookResult {
+        val url = endpoint.url
+        if (url.isBlank()) {
             return WebhookResult.Failure(
                 reason = "Webhook URL is not configured",
                 code = null,
                 message = "",
                 body = "",
+                webhookUrl = url,
             )
         }
 
-        val body = WebhookPayloadBuilder
-            .build(event)
-            .toRequestBody(JSON)
+        val requestBuilder = runCatching {
+            Request.Builder()
+                .url(url)
+                .post(payload.toRequestBody(JSON))
+                .header("Content-Type", "application/json")
+        }.getOrElse { error ->
+            return WebhookResult.Failure(
+                reason = error.message ?: error::class.java.simpleName,
+                code = null,
+                message = error::class.java.simpleName,
+                body = "",
+                webhookUrl = url,
+            )
+        }
 
-        val requestBuilder = Request.Builder()
-            .url(settings.webhookUrl)
-            .post(body)
-            .header("Content-Type", "application/json")
-
-        if (settings.secret.isNotBlank()) {
-            requestBuilder.header("X-Webhook-Secret", settings.secret)
+        if (endpoint.secret.isNotBlank()) {
+            requestBuilder.header("X-Webhook-Secret", endpoint.secret)
         }
 
         return runCatching {
@@ -47,6 +72,7 @@ class WebhookClient : WebhookSender {
                         code = response.code,
                         message = response.message,
                         body = responseBody,
+                        webhookUrl = url,
                     )
                 } else {
                     WebhookResult.Failure(
@@ -54,6 +80,7 @@ class WebhookClient : WebhookSender {
                         code = response.code,
                         message = response.message,
                         body = responseBody,
+                        webhookUrl = url,
                     )
                 }
             }
@@ -63,6 +90,7 @@ class WebhookClient : WebhookSender {
                 code = null,
                 message = error::class.java.simpleName,
                 body = "",
+                webhookUrl = url,
             )
         }
     }
@@ -81,6 +109,7 @@ sealed interface WebhookResult {
         val code: Int,
         val message: String,
         val body: String,
+        val webhookUrl: String = "",
     ) : WebhookResult
 
     data class Failure(
@@ -88,5 +117,6 @@ sealed interface WebhookResult {
         val code: Int?,
         val message: String,
         val body: String,
+        val webhookUrl: String = "",
     ) : WebhookResult
 }

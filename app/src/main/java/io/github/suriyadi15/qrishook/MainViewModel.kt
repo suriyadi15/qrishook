@@ -9,11 +9,13 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import io.github.suriyadi15.qrishook.data.AppSettings
 import io.github.suriyadi15.qrishook.data.DebugNotificationEntity
+import io.github.suriyadi15.qrishook.data.WebhookEndpoint
 import io.github.suriyadi15.qrishook.issue.MerchantParserRequestInfo
 import io.github.suriyadi15.qrishook.issue.MerchantParserRequestResult
 import io.github.suriyadi15.qrishook.notification.NotificationAccessHelper
 import io.github.suriyadi15.qrishook.notification.WatcherForegroundService
 import io.github.suriyadi15.qrishook.update.AppUpdateState
+import io.github.suriyadi15.qrishook.webhook.WebhookResult
 import io.github.suriyadi15.qrishook.worker.WebhookDeliveryWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,6 +25,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -33,6 +36,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val debugSearchQuery = MutableStateFlow("")
     private val updateState = MutableStateFlow<AppUpdateState>(AppUpdateState.Idle)
     private val parserRequestState = MutableStateFlow<ParserRequestState>(ParserRequestState.Idle)
+    private val webhookTests = MutableStateFlow<Map<String, WebhookTestState>>(emptyMap())
 
     init {
         loadInstalledApps()
@@ -52,8 +56,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         installedApps,
         historySearchQuery,
         debugSearchQuery,
-        combine(updateState, parserRequestState) { update, request -> update to request },
-    ) { settings, apps, historyQuery, debugQuery, (update, request) ->
+        combine(updateState, parserRequestState, webhookTests) { update, request, tests ->
+            Triple(update, request, tests)
+        },
+    ) { settings, apps, historyQuery, debugQuery, (update, request, tests) ->
         MainUiState(
             settings = settings,
             installedApps = apps,
@@ -61,6 +67,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             debugSearchQuery = debugQuery,
             updateState = update,
             parserRequestState = request,
+            webhookTests = tests,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -85,6 +92,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun enqueueDelivery() {
         WebhookDeliveryWorker.enqueue(getApplication())
+    }
+
+    fun testWebhook(endpoint: WebhookEndpoint) {
+        if (webhookTests.value[endpoint.id] is WebhookTestState.Sending) return
+
+        viewModelScope.launch(Dispatchers.IO) {
+            webhookTests.update { it + (endpoint.id to WebhookTestState.Sending) }
+            val result = graph.webhookClient.sendTest(endpoint)
+            webhookTests.update { it + (endpoint.id to WebhookTestState.Done(result)) }
+        }
     }
 
     fun clearDebugLogs() {
@@ -125,7 +142,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             )
             parserRequestState.value = when (result) {
                 is MerchantParserRequestResult.Success -> ParserRequestState.Sent(result.id)
-                is MerchantParserRequestResult.Failure -> ParserRequestState.Error(result.message)
+                is MerchantParserRequestResult.Failure -> ParserRequestState.Error(result)
             }
         }
     }
@@ -190,6 +207,7 @@ data class MainUiState(
     val appVersionCode: Int = BuildConfig.VERSION_CODE,
     val updateState: AppUpdateState = AppUpdateState.Idle,
     val parserRequestState: ParserRequestState = ParserRequestState.Idle,
+    val webhookTests: Map<String, WebhookTestState> = emptyMap(),
     val historySearchQuery: String = "",
     val debugSearchQuery: String = "",
     val notificationAccessGranted: Boolean = false,
@@ -200,7 +218,12 @@ sealed interface ParserRequestState {
     data object Idle : ParserRequestState
     data object Sending : ParserRequestState
     data class Sent(val id: Int) : ParserRequestState
-    data class Error(val message: String) : ParserRequestState
+    data class Error(val failure: MerchantParserRequestResult.Failure) : ParserRequestState
+}
+
+sealed interface WebhookTestState {
+    data object Sending : WebhookTestState
+    data class Done(val result: WebhookResult) : WebhookTestState
 }
 
 data class InstalledAppInfo(

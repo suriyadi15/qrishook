@@ -9,7 +9,9 @@ QRIS Hook is a native Android (Kotlin) app that watches QRIS payment notificatio
 
 - Notification monitoring with `NotificationListenerService`.
 - Backend-agnostic webhook delivery using JSON `POST`.
-- Optional `X-Webhook-Secret` header.
+- Multiple webhooks: each merchant can go to its own webhook.
+- Optional `X-Webhook-Secret` header per webhook.
+- English and Indonesian UI.
 - Merchant-specific parsers.
 - Local Room queue with background retry (WorkManager).
 - Debug mode for capturing raw notification payloads.
@@ -17,8 +19,8 @@ QRIS Hook is a native Android (Kotlin) app that watches QRIS payment notificatio
 ## How it works
 
 1. Enable notification access for QRIS Hook.
-2. Enter your webhook URL and an optional secret.
-3. Select the merchant apps to monitor.
+2. Add your webhook URL(s) and optional secrets.
+3. Select the merchant apps to monitor and the webhook each one is sent to.
 4. When a payment notification arrives, QRIS Hook parses it into an event.
 5. The event is queued locally and delivered to your webhook in the background.
 

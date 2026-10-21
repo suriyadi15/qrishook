@@ -1,4 +1,188 @@
 <resources>
     <string name="app_name">QRIS Hook</string>
     <string name="notification_listener_label">QRIS Hook Monitoring</string>
+
+    <!-- Foreground service -->
+    <string name="fg_title">QRIS Hook is active</string>
+    <string name="fg_text">QRIS Hook is monitoring notifications.</string>
+    <string name="fg_channel_name">QRIS Hook Monitoring</string>
+    <string name="fg_channel_desc">QRIS Hook background monitoring status</string>
+
+    <!-- Common -->
+    <string name="close">Close</string>
+    <string name="cancel">Cancel</string>
+    <string name="copy">Copy</string>
+    <string name="done">Done</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+    <string name="clear">Clear</string>
+    <string name="send">Send</string>
+    <string name="sending">Sending...</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_history">History</string>
+    <string name="nav_debug">Debug</string>
+    <string name="subtitle_home">QRIS notification to webhook</string>
+    <string name="subtitle_history">Matched QRIS events</string>
+    <string name="subtitle_debug">Raw notification payloads</string>
+
+    <!-- History -->
+    <string name="search_history">Search history</string>
+    <string name="history_loading">Loading history...</string>
+    <string name="history_error">Failed to load history.</string>
+    <string name="history_empty">No matching QRIS events yet.</string>
+    <string name="history_loading_more">Loading more history...</string>
+    <string name="history_error_more">Failed to load more history.</string>
+
+    <!-- Debug -->
+    <string name="search_debug_logs">Search debug logs</string>
+    <string name="debug_loading">Loading debug logs...</string>
+    <string name="debug_error">Failed to load debug logs.</string>
+    <string name="debug_empty">No debug payloads yet.</string>
+    <string name="debug_loading_more">Loading more debug logs...</string>
+    <string name="debug_error_more">Failed to load more debug logs.</string>
+    <string name="debug_mode_title">Debug Mode</string>
+    <string name="debug_mode_active_no_apps">Active, but no apps are selected.</string>
+    <string name="debug_mode_active">Active. Selected notifications are saved as raw payloads.</string>
+    <string name="debug_mode_off">Off. QRIS Hook processes notifications normally.</string>
+    <plurals name="apps_selected">
+        <item quantity="one">%1$d app selected</item>
+        <item quantity="other">%1$d apps selected</item>
+    </plurals>
+    <string name="select_apps">Select apps</string>
+    <string name="search_apps">Search apps</string>
+    <string name="no_matching_apps">No matching apps.</string>
+    <string name="debug_logs_title">Debug Logs</string>
+
+    <!-- Merchant support request -->
+    <string name="request_support_title">Request Merchant Support</string>
+    <string name="request_support_p1">To get a new merchant supported, the request must include a debug payload captured by QRIS Hook. We use it to add support for that merchant app.</string>
+    <string name="request_support_p2">Turn on Debug Mode, select the merchant app, make a real or test QRIS payment, open the captured debug log, then tap Request merchant support. The request is sent directly from the app, together with the app, package, payload, and device details. No GitHub account is needed.</string>
+    <string name="request_support_p3">Redact sensitive data such as customer names, account numbers, and transaction IDs before submitting.</string>
+    <string name="request_dialog_title">Request merchant support</string>
+    <string name="request_sent">Request sent as #%1$d. Thank you for helping QRIS Hook support more merchants.</string>
+    <string name="expected_details_label">Expected payment details (optional)</string>
+    <string name="expected_details_placeholder">Amount, sender name, payment source, received time</string>
+    <string name="contact_label">Email or WhatsApp (optional)</string>
+    <string name="debug_payload_label">Debug payload</string>
+    <string name="payload_masked_hint">Long numbers and emails were masked. Replace any customer names with [NAME] before sending.</string>
+    <string name="payload_invalid">Payload must be valid JSON.</string>
+    <string name="request_consent">I reviewed and edited the payload. I agree it is sent to the QRIS Hook maintainer and handled as described in the Privacy Policy.</string>
+    <string name="read_privacy">Read Privacy Policy</string>
+    <string name="request_support_button">Request support</string>
+    <string name="request_err_unexpected">Unexpected server response</string>
+    <string name="request_err_http">Server error (HTTP %1$d)</string>
+    <string name="request_err_unreachable">Could not reach server. Check your connection and try again.</string>
+
+    <!-- Home: access, battery, active -->
+    <string name="access_title">Notification Access</string>
+    <string name="access_enabled">Enabled. QRIS Hook can read notifications.</string>
+    <string name="access_disabled">Not enabled. Allow QRIS Hook in Android settings.</string>
+    <string name="access_restricted_hint">If Android blocks this with restricted settings, open App Info, tap More, then Allow restricted settings.</string>
+    <string name="access_open">Open access</string>
+    <string name="access_enable">Enable access</string>
+    <string name="app_info">App info</string>
+    <string name="battery_title">Battery</string>
+    <string name="battery_unrestricted">No restrictions. Android should not stop QRIS Hook in the background.</string>
+    <string name="battery_restricted">Restricted. Set no restrictions so notification monitoring keeps running.</string>
+    <string name="battery_set">Set</string>
+    <string name="battery_allow">Allow</string>
+    <string name="active_title">QRIS Hook Active</string>
+    <string name="active_paused">Paused. Merchant and debug settings stay saved.</string>
+    <string name="active_waiting">Waiting for Notification Access.</string>
+    <string name="active_running">Active. QRIS Hook is monitoring notifications in the background.</string>
+
+    <!-- Home: language, open source, version -->
+    <string name="language_title">Language</string>
+    <string name="language_system">Follow system</string>
+    <string name="language_english">English</string>
+    <string name="language_indonesian">Bahasa Indonesia</string>
+    <string name="opensource_title">Open Source</string>
+    <string name="opensource_desc">View the source code, report issues, or contribute merchant parsers on GitHub.</string>
+    <string name="github">GitHub</string>
+    <string name="version_title">App Version</string>
+    <string name="version_line">Version %1$s (%2$d)</string>
+    <string name="update_idle">Update status has not been checked yet.</string>
+    <string name="update_loading">Checking latest GitHub release...</string>
+    <string name="update_up_to_date">You are using the latest version (%1$s).</string>
+    <string name="update_available">Version %1$s is available.</string>
+    <string name="update_failed">Update check failed: %1$s</string>
+    <string name="update_err_http">HTTP %1$d</string>
+    <string name="update_err_read">Could not read the latest release.</string>
+    <string name="checking">Checking...</string>
+    <string name="check_update">Check update</string>
+    <string name="update">Update</string>
+
+    <!-- Webhooks -->
+    <string name="webhook_title">Webhooks</string>
+    <string name="webhook_empty">No webhook yet. Add your server URL to start receiving QRIS payments.</string>
+    <string name="webhook_add">Add webhook</string>
+    <string name="webhook_retry">Retry pending</string>
+    <string name="webhook_default_chip">Default</string>
+    <string name="webhook_other_merchants">Other merchants</string>
+    <string name="webhook_secret_set">Secret set</string>
+    <string name="webhook_testing">Testing...</string>
+    <string name="webhook_test_ok">Test OK (HTTP %1$d)</string>
+    <string name="webhook_test_fail">Test failed: %1$s</string>
+    <string name="webhook_unrouted_banner">No webhook for: %1$s. Payments from these merchants will not be delivered.</string>
+    <string name="webhook_unrouted_action">Set up</string>
+    <string name="webhook_sheet_add_title">Add webhook</string>
+    <string name="webhook_sheet_edit_title">Edit webhook</string>
+    <string name="webhook_name_label">Name</string>
+    <string name="webhook_name_placeholder">e.g. Store A server</string>
+    <string name="webhook_url_label">Webhook URL</string>
+    <string name="webhook_url_placeholder">https://example.com/qris-webhook</string>
+    <string name="webhook_url_invalid">Enter a valid http:// or https:// URL.</string>
+    <string name="webhook_url_insecure">Not encrypted (http). Release builds block http, so use https.</string>
+    <string name="webhook_secret_label">Secret (optional)</string>
+    <string name="webhook_secret_helper">Sent as the X-Webhook-Secret header.</string>
+    <string name="webhook_secret_show">Show</string>
+    <string name="webhook_secret_hide">Hide</string>
+    <string name="webhook_secret_generate">Generate</string>
+    <string name="webhook_merchants_title">Merchants sent to this webhook</string>
+    <string name="webhook_merchant_currently">now: %1$s</string>
+    <string name="webhook_default_switch">Make default webhook</string>
+    <string name="webhook_default_helper">Used for merchants that are not assigned to any webhook.</string>
+    <string name="webhook_send_test">Send test</string>
+    <string name="webhook_delete_title">Delete webhook?</string>
+    <string name="webhook_delete_message">\"%1$s\" will be removed.</string>
+    <string name="webhook_delete_affected">Merchants that will use the default webhook or have no destination: %1$s</string>
+
+    <!-- Merchants -->
+    <string name="merchant_title">Merchant</string>
+    <string name="merchant_dest">→ %1$s</string>
+    <string name="merchant_dest_default">→ %1$s (default)</string>
+    <string name="merchant_dest_none">⚠ No webhook</string>
+
+    <!-- Delivery status -->
+    <string name="status_pending">Pending</string>
+    <string name="status_sending">Sending</string>
+    <string name="status_sent">Sent</string>
+    <string name="status_failed">Failed</string>
+
+    <!-- Event detail -->
+    <string name="detail_payment">Payment</string>
+    <string name="detail_amount">Amount</string>
+    <string name="detail_merchant">Merchant</string>
+    <string name="detail_sender">Sender</string>
+    <string name="detail_source">Source</string>
+    <string name="detail_received">Received</string>
+    <string name="detail_delivery">Delivery</string>
+    <string name="detail_status">Status</string>
+    <string name="detail_attempts">Attempts</string>
+    <string name="detail_last_error">Last error</string>
+    <string name="detail_last_attempt">Last webhook attempt</string>
+    <string name="detail_webhook_target">Webhook target</string>
+    <string name="detail_updated">Updated</string>
+    <string name="detail_webhook_response">Webhook response</string>
+    <string name="detail_code">Code</string>
+    <string name="detail_message">Message</string>
+    <string name="detail_body">Body</string>
+    <string name="detail_notification">Notification</string>
+    <string name="detail_package">Package</string>
+    <string name="detail_title">Title</string>
+    <string name="detail_text">Text</string>
+    <string name="detail_big_text">Big text</string>
+    <string name="detail_webhook_payload">Webhook payload</string>
 </resources>

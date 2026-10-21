@@ -8,7 +8,7 @@ import io.github.suriyadi15.qrishook.domain.DeliveryStatus
 
 @Database(
     entities = [EventEntity::class, DebugNotificationEntity::class],
-    version = 4,
+    version = 5,
     exportSchema = false,
 )
 @TypeConverters(AppTypeConverters::class)

@@ -29,6 +29,7 @@ interface EventDao {
             OR senderName LIKE '%' || :query || '%' COLLATE NOCASE
             OR paymentSource LIKE '%' || :query || '%' COLLATE NOCASE
             OR status LIKE '%' || :query || '%' COLLATE NOCASE
+            OR lastWebhookUrl LIKE '%' || :query || '%' COLLATE NOCASE
             OR CAST(amount AS TEXT) LIKE '%' || :query || '%'
         ORDER BY createdAtMillis DESC
         """,
@@ -64,6 +65,7 @@ interface EventDao {
             lastResponseMessage = :lastResponseMessage,
             lastResponseBody = :lastResponseBody,
             lastWebhookAttemptAtMillis = :lastWebhookAttemptAtMillis,
+            lastWebhookUrl = :lastWebhookUrl,
             updatedAtMillis = :updatedAtMillis
         WHERE eventId = :eventId
         """,
@@ -75,6 +77,7 @@ interface EventDao {
         lastResponseCode: Int?,
         lastResponseMessage: String,
         lastResponseBody: String,
+        lastWebhookUrl: String,
         lastWebhookAttemptAtMillis: Long = System.currentTimeMillis(),
         updatedAtMillis: Long = System.currentTimeMillis(),
     )

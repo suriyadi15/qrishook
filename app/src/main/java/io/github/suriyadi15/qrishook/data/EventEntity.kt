@@ -32,6 +32,7 @@ data class EventEntity(
     val lastWebhookAttemptAtMillis: Long?,
     val createdAtMillis: Long,
     val updatedAtMillis: Long,
+    val lastWebhookUrl: String = "",
 ) {
     companion object {
         fun fromEvent(event: QrisPaymentEvent): EventEntity {

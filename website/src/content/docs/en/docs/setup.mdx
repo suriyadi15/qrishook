@@ -11,9 +11,9 @@ import { Steps } from '@astrojs/starlight/components';
 
 2. **Enable notification access.** Open Android settings → *Notification access* → enable **QRIS Hook**.
 
-3. **Set your webhook.** Enter the webhook URL and, if needed, a secret. The secret is sent as the `X-Webhook-Secret` header.
+3. **Add a webhook.** Tap **Add webhook**, enter a name and the URL and, if needed, a secret (sent as the `X-Webhook-Secret` header). Tap **Send test** to confirm your server answers with a 2xx.
 
-4. **Select merchants.** Tick the merchant apps you want to monitor (see [supported merchants](/en/docs/merchants/)).
+4. **Select merchants.** Tick the merchant apps you want to monitor (see [supported merchants](/en/docs/merchants/)). In the webhook editor you choose which merchants go to that webhook; merchants you don't assign use the **default** webhook.
 
 5. **Turn on `QRIS Hook Active`.** Without it, notifications aren't processed at all.
 

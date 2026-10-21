@@ -3,6 +3,7 @@ package io.github.suriyadi15.qrishook.webhook
 import io.github.suriyadi15.qrishook.data.AppSettings
 import io.github.suriyadi15.qrishook.data.EventDeliveryStore
 import io.github.suriyadi15.qrishook.data.EventEntity
+import io.github.suriyadi15.qrishook.data.WebhookEndpoint
 import io.github.suriyadi15.qrishook.domain.DeliveryStatus
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -16,7 +17,7 @@ class WebhookDeliveryRunnerTest {
         val sender = FakeWebhookSender(WebhookResult.Success(200, "OK", "{}"))
         val runner = WebhookDeliveryRunner(store, sender)
 
-        val result = runner.deliver(event(), AppSettings(webhookUrl = "https://example.test/webhook"))
+        val result = runner.deliver(event(), settings())
 
         assertTrue(result is WebhookDeliveryResult.Success)
         assertEquals(listOf("sending:event-1", "sent:event-1:200"), store.calls)
@@ -36,7 +37,7 @@ class WebhookDeliveryRunnerTest {
         )
         val runner = WebhookDeliveryRunner(store, sender)
 
-        val result = runner.deliver(event(), AppSettings(webhookUrl = "https://example.test/webhook"))
+        val result = runner.deliver(event(), settings())
 
         assertTrue(result is WebhookDeliveryResult.Failure)
         assertEquals(listOf("sending:event-1", "failed:event-1:HTTP 500"), store.calls)
@@ -56,7 +57,7 @@ class WebhookDeliveryRunnerTest {
 
         val result = runner.deliverBatch(
             listOf(event("event-1"), event("event-2")),
-            AppSettings(webhookUrl = "https://example.test/webhook"),
+            settings(),
         )
 
         assertTrue(result is WebhookBatchDeliveryResult.HasFailure)
@@ -107,6 +108,11 @@ class WebhookDeliveryRunnerTest {
             return results.removeFirst()
         }
     }
+
+    private fun settings() = AppSettings(
+        webhooks = listOf(WebhookEndpoint(id = "w1", name = "Main", url = "https://example.test/webhook")),
+        defaultWebhookId = "w1",
+    )
 
     private fun event(eventId: String = "event-1") = EventEntity(
         eventId = eventId,

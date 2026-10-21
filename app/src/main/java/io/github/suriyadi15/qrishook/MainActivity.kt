@@ -10,7 +10,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
-import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -24,7 +24,7 @@ import io.github.suriyadi15.qrishook.notification.NotificationAccessHelper
 import io.github.suriyadi15.qrishook.ui.QrisHookScreen
 import io.github.suriyadi15.qrishook.ui.QrisHookTheme
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by viewModels()
     private var notificationAccessGranted by mutableStateOf(false)
     private var ignoringBatteryOptimizations by mutableStateOf(false)
@@ -76,6 +76,7 @@ class MainActivity : ComponentActivity() {
                         startActivitySafely(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
                     },
                     onTestDelivery = viewModel::enqueueDelivery,
+                    onTestWebhook = viewModel::testWebhook,
                     onClearDebugLogs = viewModel::clearDebugLogs,
                 )
             }

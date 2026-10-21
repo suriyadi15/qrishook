@@ -44,6 +44,7 @@ class EventRepository(
             lastResponseCode = result.code,
             lastResponseMessage = result.message,
             lastResponseBody = result.body,
+            lastWebhookUrl = result.webhookUrl,
         )
     }
 
@@ -55,6 +56,7 @@ class EventRepository(
             lastResponseCode = result.code,
             lastResponseMessage = result.message,
             lastResponseBody = result.body,
+            lastWebhookUrl = result.webhookUrl,
         )
     }
 }

@@ -3,6 +3,7 @@ agp = "9.2.1"
 kotlin = "2.2.20"
 ksp = "2.3.2"
 coreKtx = "1.17.0"
+appcompat = "1.7.1"
 activityCompose = "1.11.0"
 composeBom = "2025.10.00"
 lifecycle = "2.9.4"
@@ -16,6 +17,7 @@ orgJson = "20240303"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
 androidx-compose-ui = { module = "androidx.compose.ui:ui" }

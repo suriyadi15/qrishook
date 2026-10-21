@@ -54,7 +54,8 @@ compatibility.
 
 - Notification monitoring with `NotificationListenerService`.
 - Backend-agnostic webhook delivery using JSON `POST` requests.
-- Optional `X-Webhook-Secret` header.
+- Multiple webhooks: route each merchant to its own webhook URL (several merchants can share one), each with its own optional `X-Webhook-Secret` header.
+- Built-in English and Indonesian UI, selectable in the app or following the system language.
 - Built-in merchant selection through `MerchantRegistry`.
 - Merchant-specific parsers for package matching and QRIS payment extraction.
 - Webhook payloads with formatted payment data and raw notification fields.
@@ -64,8 +65,8 @@ compatibility.
 ## How It Works
 
 1. Enable notification access for QRIS Hook in Android settings.
-2. Enter your webhook URL and optional secret in the app.
-3. Select the merchant apps you want QRIS Hook to monitor.
+2. Add one or more webhooks (name, URL, optional secret) in the app and tap **Send test** to check each one.
+3. Select the merchant apps you want QRIS Hook to monitor, and choose which webhook each merchant is sent to. Merchants without a choice use the default webhook.
 4. When a matching QRIS payment notification arrives, QRIS Hook parses it into a payment event.
 5. The event is queued locally and delivered to your webhook in the background.
 
@@ -174,7 +175,7 @@ Retry behavior:
 }
 ```
 
-If a secret is configured, the webhook request includes:
+If the webhook has a secret, the request includes:
 
 ```http
 X-Webhook-Secret: your-secret
