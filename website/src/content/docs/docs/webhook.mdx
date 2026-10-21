@@ -1,0 +1,67 @@
+---
+title: Webhook payload
+description: Skema JSON dan contoh receiver.
+---
+
+Setiap pembayaran dikirim sebagai `POST` dengan `Content-Type: application/json`.
+
+```json
+{
+  "event_id": "uuid",
+  "type": "qris.payment.success",
+  "merchant_id": "demo_merchant",
+  "source_package": "com.example.merchant",
+  "source_app": "Demo Merchant",
+  "received_at": "2030-05-21T12:00:00+07:00",
+  "notification": {
+    "source_package": "com.example.merchant",
+    "source_app": "Demo Merchant",
+    "title": "string",
+    "text": "string",
+    "big_text": "string",
+    "received_at": "2030-05-21T12:00:00Z"
+  },
+  "payment": {
+    "amount": 10000,
+    "currency": "IDR",
+    "sender_name": "John Doe",
+    "payment_source": "Demo"
+  },
+  "raw": {
+    "source_package": "com.example.merchant",
+    "source_app": "Demo Merchant",
+    "title": "string",
+    "text": "string",
+    "big_text": "string",
+    "received_at": "2026-05-21T12:00:00Z"
+  }
+}
+```
+
+Jika secret diisi, request menyertakan:
+
+```http
+X-Webhook-Secret: your-secret
+```
+
+## Contoh receiver
+
+Balas status **2xx** agar event ditandai `Sent`. Gunakan `event_id` untuk idempotensi karena event bisa terkirim ulang saat retry.
+
+```ts title="server.ts (Hono)"
+import { Hono } from "hono";
+
+const app = new Hono();
+
+app.post("/qris", async (c) => {
+  if (c.req.header("X-Webhook-Secret") !== process.env.WEBHOOK_SECRET) {
+    return c.json({ error: "unauthorized" }, 401);
+  }
+  const event = await c.req.json();
+  // simpan event.event_id, abaikan jika sudah ada
+  console.log(event.payment.amount, event.payment.sender_name);
+  return c.json({ ok: true });
+});
+
+export default app;
+```

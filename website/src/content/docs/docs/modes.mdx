@@ -1,0 +1,15 @@
+---
+title: Mode Active & Debug
+description: Perilaku saklar QRIS Hook Active dan Debug Mode.
+---
+
+`QRIS Hook Active` adalah saklar utama. Saat mati, **tidak ada** notifikasi yang diproses, bahkan jika Debug Mode menyala. Pilihan merchant dan pengaturan debug tetap tersimpan.
+
+Saat `Debug Mode` menyala (dan Active menyala), penangkapan debug didahulukan: notifikasi dari paket yang dipilih disimpan sebagai payload mentah dan pengiriman webhook dilewati.
+
+| QRIS Hook Active | Debug Mode | Perilaku |
+| --- | --- | --- |
+| Mati | Mati | Notifikasi diabaikan. |
+| Mati | Nyala | Tetap diabaikan; tidak ada log debug. |
+| Nyala | Mati | Notifikasi QRIS yang cocok di-parse dan masuk antrean webhook. |
+| Nyala | Nyala | Payload mentah dari paket debug yang dipilih disimpan; webhook dilewati. |

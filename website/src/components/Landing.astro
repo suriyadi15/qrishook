@@ -1,0 +1,198 @@
+---
+import { Image } from "astro:assets";
+import { Code } from "astro-expressive-code/components";
+import { dict, merchants, payload, REPO, RELEASES, REQUEST_PARSER, type Locale } from "../i18n/landing";
+import s1 from "../assets/screenshots/1.jpg";
+import s2 from "../assets/screenshots/2.jpg";
+import s3 from "../assets/screenshots/3.jpg";
+import s4 from "../assets/screenshots/4.jpg";
+import s5 from "../assets/screenshots/5.jpg";
+import s6 from "../assets/screenshots/6.jpg";
+import s7 from "../assets/screenshots/7.jpg";
+
+const ghIcon = '<svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = dict[locale];
+const shots = [s1, s2, s3, s4, s5, s6, s7];
+---
+
+<!doctype html>
+<html lang={t.lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{t.title}</title>
+    <meta name="description" content={t.description} />
+    <meta property="og:title" content={t.title} />
+    <meta property="og:description" content={t.description} />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate" hreflang="id" href={new URL("/", Astro.site)} />
+    <link rel="alternate" hreflang="en" href={new URL("/en/", Astro.site)} />
+    <script is:inline>
+      try {
+        const saved = localStorage.getItem("starlight-theme");
+        const dark = saved ? saved === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+        document.documentElement.dataset.theme = dark ? "dark" : "light";
+      } catch {
+        document.documentElement.dataset.theme = "dark";
+      }
+    </script>
+  </head>
+  <body>
+    <header class="top">
+      <div class="wrap bar">
+        <a class="brand" href={t.home}><img src="/favicon.svg" alt="" width="28" height="28" />QRIS Hook</a>
+        <nav>
+          <a href="#features">{t.nav.features}</a>
+          <a href="#how">{t.nav.how}</a>
+          <a href="#merchants">{t.nav.merchants}</a>
+          <a href={t.docsBase}>{t.nav.docs}</a>
+          <a href={t.other.href} class="lang" hreflang={locale === "id" ? "en" : "id"}>{t.other.label}</a>
+          <a href={REPO} class="gh" rel="noopener"><Fragment set:html={ghIcon} />GitHub</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero wrap">
+        <span class="badge">{t.hero.badge}</span>
+        <h1>{t.hero.h1a}<br /><em>{t.hero.h1b}</em></h1>
+        <p class="sub">{t.hero.sub}</p>
+        <div class="cta">
+          <a class="btn primary" href={RELEASES} rel="noopener">{t.hero.download}</a>
+          <a class="btn" href={t.docsBase}>{t.hero.docs}</a>
+        </div>
+        <div class="phones" aria-hidden="true">
+          {[s1, s2, s3].map((img, i) => (
+            <div class={`phone p${i}`}><Image src={img} alt="" widths={[240, 360]} sizes="(max-width: 700px) 30vw, 240px" loading="eager" /></div>
+          ))}
+        </div>
+      </section>
+
+      <section id="features" class="wrap sec">
+        <h2>{t.featuresTitle}</h2>
+        <div class="grid">
+          {t.features.map(([title, body]) => (
+            <article class="card"><h3>{title}</h3><p>{body}</p></article>
+          ))}
+        </div>
+      </section>
+
+      <section id="how" class="wrap sec">
+        <h2>{t.howTitle}</h2>
+        <ol class="steps">
+          {t.steps.map(([title, body], i) => (
+            <li class="card"><span class="num">{i + 1}</span><h3>{title}</h3><p>{body}</p></li>
+          ))}
+        </ol>
+        <div class="flow" aria-hidden="true">
+          <span>Notification</span><i>→</i><span>Parser</span><i>→</i><span>Room queue</span><i>→</i><span>POST webhook</span>
+        </div>
+      </section>
+
+      <section class="wrap sec split">
+        <div>
+          <h2>{t.payloadTitle}</h2>
+          <p class="muted">{t.payloadSub}</p>
+          <p class="muted"><code>X-Webhook-Secret: your-secret</code></p>
+        </div>
+        <Code code={payload} lang="json" />
+      </section>
+
+      <section id="merchants" class="wrap sec">
+        <h2>{t.merchantsTitle}</h2>
+        <p class="muted">{t.merchantsSub}</p>
+        <ul class="merchants">
+          {merchants.map((m) => (
+            <li class="card"><h3>{m.name}</h3><code>{m.pkg}</code></li>
+          ))}
+        </ul>
+        <a class="btn" href={REQUEST_PARSER} rel="noopener">{t.requestParser}</a>
+      </section>
+
+      <section class="sec">
+        <div class="wrap"><h2>{t.screensTitle}</h2></div>
+        <div class="gallery">
+          {shots.map((img, i) => (
+            <div class="phone"><Image src={img} alt={`QRIS Hook screenshot ${i + 1}`} widths={[240, 360]} sizes="240px" loading="lazy" /></div>
+          ))}
+        </div>
+      </section>
+
+      <section class="wrap sec final">
+        <h2>{t.ctaTitle}</h2>
+        <p class="muted">{t.ctaSub}</p>
+        <div class="cta">
+          <a class="btn primary" href={RELEASES} rel="noopener">{t.hero.download}</a>
+          <a class="btn gh" href={REPO} rel="noopener"><Fragment set:html={ghIcon} />{t.build}</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="wrap foot">
+      <p>{t.disclaimer} <a href={`${t.docsBase}disclaimer/`}>{t.disclaimerMore}</a></p>
+      <p>{t.license} © 2026 suriyadi15</p>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --bg: #07110f; --fg: #e7f1ee; --muted: #93a8a2; --line: #1c2e2a;
+    --card: #0d1a17; --accent: #19b894; --accent-fg: #03140f;
+  }
+  :root[data-theme="light"] {
+    --bg: #f6faf9; --fg: #0b1a16; --muted: #53665f; --line: #d5e3df;
+    --card: #ffffff; --accent: #0a7a62; --accent-fg: #ffffff;
+  }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; line-height: 1.6; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+  .top { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 85%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+  .bar { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 12px; }
+  .brand { display: flex; align-items: center; gap: 8px; font-weight: 700; color: var(--fg); text-decoration: none; }
+  nav { display: flex; align-items: center; gap: 18px; font-size: 14px; }
+  nav a { color: var(--muted); text-decoration: none; }
+  nav a:hover { color: var(--fg); }
+  nav .gh, .btn.gh { display: inline-flex; align-items: center; gap: 6px; }
+  nav .lang, nav .gh { border: 1px solid var(--line); padding: 3px 10px; border-radius: 8px; color: var(--fg); }
+  @media (max-width: 720px) { nav a:not(.lang):not(.gh) { display: none; } }
+  .hero { text-align: center; padding-top: 72px; overflow: hidden; }
+  .badge { display: inline-block; font-size: 12px; padding: 4px 12px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); }
+  h1 { font-size: clamp(2.2rem, 6vw, 4rem); line-height: 1.1; margin: 18px 0; letter-spacing: -0.03em; }
+  h1 em { font-style: normal; color: var(--accent); }
+  h2 { font-size: clamp(1.6rem, 3.5vw, 2.2rem); letter-spacing: -0.02em; margin: 0 0 12px; }
+  h3 { margin: 0 0 6px; font-size: 1.05rem; }
+  .sub { max-width: 640px; margin: 0 auto 28px; color: var(--muted); font-size: 1.1rem; }
+  .muted { color: var(--muted); }
+  .cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn { display: inline-block; padding: 11px 22px; border-radius: 10px; border: 1px solid var(--line); color: var(--fg); text-decoration: none; font-weight: 600; background: var(--card); }
+  .btn.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+  .btn:hover { filter: brightness(1.1); }
+  .phones { display: flex; justify-content: center; align-items: flex-start; gap: 16px; margin-top: 48px; height: 340px; overflow: hidden; -webkit-mask-image: linear-gradient(to bottom, #000 75%, transparent); mask-image: linear-gradient(to bottom, #000 75%, transparent); }
+  .phone { border: 6px solid var(--line); border-radius: 28px; overflow: hidden; background: var(--card); flex: none; }
+  .phone img { display: block; width: 100%; height: auto; }
+  .phones .phone { width: min(30vw, 220px); }
+  .phones .p0, .phones .p2 { margin-top: 24px; }
+  .sec { padding-top: 88px; padding-bottom: 8px; }
+  .grid, .steps, .merchants { display: grid; gap: 16px; list-style: none; padding: 0; margin: 24px 0; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
+  .card p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+  .num { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: var(--accent-fg); font-weight: 700; margin-bottom: 10px; }
+  .flow { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; font-family: ui-monospace, monospace; font-size: 13px; }
+  .flow span { border: 1px dashed var(--accent); padding: 6px 12px; border-radius: 8px; }
+  .flow i { color: var(--muted); font-style: normal; }
+  .split { display: grid; gap: 32px; grid-template-columns: 1fr; align-items: start; }
+  @media (min-width: 860px) { .split { grid-template-columns: 1fr 1.2fr; } }
+  code { font-family: ui-monospace, monospace; font-size: 0.85em; color: var(--accent); word-break: break-all; }
+  .gallery { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 24px max(16px, calc((100vw - 1080px) / 2)); }
+  .gallery .phone { width: 220px; scroll-snap-align: start; }
+  .final { text-align: center; }
+  .foot { margin-top: 88px; padding: 28px 16px 48px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+  .foot a { color: var(--accent); }
+</style>

@@ -1,0 +1,28 @@
+---
+title: Build & rilis
+description: Build dari source dan alur rilis otomatis.
+---
+
+## Build
+
+Kebutuhan: Android Studio atau Android SDK yang terkonfigurasi, dan JDK 17+.
+
+```bash
+./gradlew assembleDebug        # app/build/outputs/apk/debug/app-debug.apk
+./gradlew testDebugUnitTest    # unit test
+```
+
+## Rilis otomatis
+
+Workflow GitHub Actions hanya berjalan saat tag versi `vX.Y.Z` di-push. Tag dipakai sebagai versi aplikasi, APK rilis ditandatangani, GitHub Release dibuat dengan catatan otomatis, dan APK diunggah sebagai asset.
+
+```bash
+git tag v1.3.0
+git push origin v1.3.0
+```
+
+Secret repository yang dibutuhkan: `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`.
+
+```bash
+base64 -w 0 release-keystore.jks   # isi ANDROID_KEYSTORE_BASE64
+```

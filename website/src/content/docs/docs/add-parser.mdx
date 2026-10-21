@@ -1,0 +1,24 @@
+---
+title: Menambah parser
+description: Membuat dan mendaftarkan parser merchant baru.
+---
+
+Buat kelas yang meng-extend `MerchantParser`, lalu daftarkan di `MerchantRegistry.builtInParsers`.
+
+```kotlin title="ExampleMerchantParser.kt"
+object ExampleMerchantParser : MerchantParser() {
+    override val merchantId = "merchant_id"
+    override val displayName = "Merchant Name"
+    override val merchantPackages = listOf("package.name.merchant")
+
+    private val successKeywords = listOf("qris", "success", "paid")
+    private val ignoreKeywords = listOf("failed", "refund", "promo")
+
+    override fun parse(notification: ObservedNotification): QrisPaymentEvent? {
+        // Implementasi parsing khusus merchant di sini.
+        return null
+    }
+}
+```
+
+Lokasi kode: `app/src/main/java/io/github/suriyadi15/qrishook/merchant/`. Lihat parser yang ada (mis. `GoPayMerchantParser.kt`) dan tesnya di `app/src/test/.../merchant/` sebagai contoh. Jalankan `./gradlew testDebugUnitTest` sebelum membuat pull request.

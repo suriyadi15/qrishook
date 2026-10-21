@@ -1,0 +1,21 @@
+---
+title: Request parser
+description: Cara menangkap payload debug untuk meminta dukungan merchant baru.
+---
+
+Format notifikasi berbeda antar aplikasi dan versi. Untuk meminta dukungan merchant baru:
+
+1. Aktifkan akses notifikasi untuk QRIS Hook.
+2. Buka QRIS Hook dan nyalakan `Debug Mode`.
+3. Pilih aplikasi merchant yang ingin ditangkap.
+4. Picu notifikasi QRIS asli atau uji dari aplikasi tersebut.
+5. Buka `Debug Logs`, pilih log, lalu tekan `Copy`.
+6. Buat issue [Merchant parser request](https://github.com/suriyadi15/qrishook/issues/new?template=merchant_parser_request.yml) berisi:
+   - nama aplikasi merchant
+   - package name
+   - detail pembayaran yang diharapkan
+   - payload debug yang disalin
+
+:::caution
+Payload debug **wajib** ada; request tanpa payload tidak bisa diimplementasikan dengan andal. Sebelum posting, samarkan data sensitif: nama pelanggan, nomor telepon, nomor rekening, ID transaksi, dan data pribadi lain.
+:::

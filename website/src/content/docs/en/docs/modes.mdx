@@ -1,0 +1,15 @@
+---
+title: Active & Debug mode
+description: How the QRIS Hook Active and Debug Mode switches behave.
+---
+
+`QRIS Hook Active` is the master switch. When it's off, **no** notification is processed, even if Debug Mode is on. Merchant selections and debug settings stay saved.
+
+When `Debug Mode` is on (and Active is on), debug capture takes priority: notifications from the selected packages are stored as raw payloads and webhook delivery is skipped.
+
+| QRIS Hook Active | Debug Mode | Behavior |
+| --- | --- | --- |
+| Off | Off | Incoming notifications are ignored. |
+| Off | On | Still ignored; no debug logs are captured. |
+| On | Off | Matching QRIS notifications are parsed and queued for webhook delivery. |
+| On | On | Raw notifications from selected debug packages are saved; webhook delivery is skipped. |

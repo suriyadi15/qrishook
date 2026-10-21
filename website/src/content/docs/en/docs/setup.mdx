@@ -1,0 +1,24 @@
+---
+title: Install & setup
+description: Install the APK and connect it to your webhook.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+<Steps>
+
+1. **Download the latest APK** from [GitHub Releases](https://github.com/suriyadi15/qrishook/releases/latest) and install it on your Android phone (allow installs from this source).
+
+2. **Enable notification access.** Open Android settings → *Notification access* → enable **QRIS Hook**.
+
+3. **Set your webhook.** Enter the webhook URL and, if needed, a secret. The secret is sent as the `X-Webhook-Secret` header.
+
+4. **Select merchants.** Tick the merchant apps you want to monitor (see [supported merchants](/en/docs/merchants/)).
+
+5. **Turn on `QRIS Hook Active`.** Without it, notifications aren't processed at all.
+
+</Steps>
+
+:::tip
+Use an HTTPS URL in production. Debug builds allow cleartext HTTP for local testing; release builds don't.
+:::

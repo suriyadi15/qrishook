@@ -1,0 +1,28 @@
+---
+title: Build & release
+description: Build from source and the automated release flow.
+---
+
+## Build
+
+Requirements: Android Studio or a configured Android SDK, and JDK 17+.
+
+```bash
+./gradlew assembleDebug        # app/build/outputs/apk/debug/app-debug.apk
+./gradlew testDebugUnitTest    # unit tests
+```
+
+## Automated releases
+
+The GitHub Actions workflow runs only when a version tag (`vX.Y.Z`) is pushed. The tag becomes the app version, a signed release APK is built, a GitHub Release is created with generated notes, and the APK is uploaded as an asset.
+
+```bash
+git tag v1.3.0
+git push origin v1.3.0
+```
+
+Required repository secrets: `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`.
+
+```bash
+base64 -w 0 release-keystore.jks   # value for ANDROID_KEYSTORE_BASE64
+```

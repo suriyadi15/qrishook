@@ -1,0 +1,25 @@
+---
+title: Pengantar
+description: Apa itu QRIS Hook dan untuk siapa.
+---
+
+QRIS Hook adalah aplikasi Android native (Kotlin) yang membaca notifikasi pembayaran QRIS dari aplikasi merchant, lalu mengirim event pembayaran ke **webhook milik Anda**.
+
+## Fitur utama
+
+- Pemantauan notifikasi lewat `NotificationListenerService`.
+- Pengiriman webhook `POST` JSON, agnostik terhadap backend.
+- Header `X-Webhook-Secret` opsional.
+- Parser khusus per aplikasi merchant.
+- Antrean lokal Room dengan retry di latar belakang (WorkManager).
+- Debug mode untuk menangkap payload notifikasi mentah.
+
+## Cara kerja singkat
+
+1. Aktifkan akses notifikasi untuk QRIS Hook.
+2. Isi URL webhook dan secret (opsional).
+3. Pilih aplikasi merchant yang dipantau.
+4. Saat notifikasi pembayaran masuk, QRIS Hook mem-parse-nya menjadi event.
+5. Event masuk antrean lokal dan dikirim ke webhook di latar belakang.
+
+Lanjut ke [Instalasi & setup](/docs/setup/).

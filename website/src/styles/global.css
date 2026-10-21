@@ -1,0 +1,17 @@
+@layer base, starlight, theme, utilities;
+
+@import "@astrojs/starlight-tailwind";
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+:root {
+  --sl-color-accent-low: #053a30;
+  --sl-color-accent: #0d9477;
+  --sl-color-accent-high: #8fe3cc;
+}
+
+:root[data-theme="light"] {
+  --sl-color-accent-low: #c9f2e5;
+  --sl-color-accent: #0a7a62;
+  --sl-color-accent-high: #04503f;
+}

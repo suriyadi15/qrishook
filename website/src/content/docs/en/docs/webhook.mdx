@@ -1,0 +1,67 @@
+---
+title: Webhook payload
+description: JSON schema and a sample receiver.
+---
+
+Each payment is sent as a `POST` with `Content-Type: application/json`.
+
+```json
+{
+  "event_id": "uuid",
+  "type": "qris.payment.success",
+  "merchant_id": "demo_merchant",
+  "source_package": "com.example.merchant",
+  "source_app": "Demo Merchant",
+  "received_at": "2030-05-21T12:00:00+07:00",
+  "notification": {
+    "source_package": "com.example.merchant",
+    "source_app": "Demo Merchant",
+    "title": "string",
+    "text": "string",
+    "big_text": "string",
+    "received_at": "2030-05-21T12:00:00Z"
+  },
+  "payment": {
+    "amount": 10000,
+    "currency": "IDR",
+    "sender_name": "John Doe",
+    "payment_source": "Demo"
+  },
+  "raw": {
+    "source_package": "com.example.merchant",
+    "source_app": "Demo Merchant",
+    "title": "string",
+    "text": "string",
+    "big_text": "string",
+    "received_at": "2026-05-21T12:00:00Z"
+  }
+}
+```
+
+If a secret is configured, the request includes:
+
+```http
+X-Webhook-Secret: your-secret
+```
+
+## Sample receiver
+
+Reply with a **2xx** status so the event is marked `Sent`. Use `event_id` for idempotency, since an event can be delivered again on retry.
+
+```ts title="server.ts (Hono)"
+import { Hono } from "hono";
+
+const app = new Hono();
+
+app.post("/qris", async (c) => {
+  if (c.req.header("X-Webhook-Secret") !== process.env.WEBHOOK_SECRET) {
+    return c.json({ error: "unauthorized" }, 401);
+  }
+  const event = await c.req.json();
+  // store event.event_id, skip if it already exists
+  console.log(event.payment.amount, event.payment.sender_name);
+  return c.json({ ok: true });
+});
+
+export default app;
+```

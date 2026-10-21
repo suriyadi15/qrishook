@@ -1,0 +1,36 @@
+---
+title: Delivery & retry
+description: Event statuses, delivery flow, and retry behavior.
+---
+
+Matching notifications are saved to the Room database first, then QRIS Hook immediately tries to deliver them from a background coroutine. `WebhookDeliveryWorker` is the retry/fallback path.
+
+## Flow
+
+1. `NotificationProcessor` reads the current settings.
+2. If `QRIS Hook Active` is off, the notification is ignored.
+3. If `Debug Mode` is on, raw payloads are saved and webhook delivery is skipped.
+4. In normal mode, the notification is matched against the selected merchant parsers.
+5. Every valid event is queued with status `Pending`.
+6. The event is marked `Sending` and sent as a JSON `POST`.
+7. A 2xx response → `Sent`. A failure → `Failed` and a retry worker is enqueued.
+
+## Statuses
+
+| Status | Meaning |
+| --- | --- |
+| `Pending` | Queued, waiting to enter delivery. |
+| `Sending` | Delivery is being attempted. |
+| `Sent` | The webhook returned 2xx. |
+| `Failed` | The last attempt failed; the event stays eligible for retry. |
+
+## Retry
+
+- The worker processes non-`Sent` events oldest first, up to 10 per batch.
+- Non-2xx responses, network errors, invalid URLs, timeouts, and network security errors are recorded as failures (`lastError`, `lastResponseCode`, `attempts`, etc.).
+- WorkManager retries with exponential backoff starting at 30 seconds.
+- There is no maximum retry limit; failed events stay queued until sent or app data is cleared.
+
+:::note
+If a new event stays `Pending` for more than a moment, immediate delivery didn't start. Check that a webhook URL is saved, then tap **Retry pending** in the app.
+:::

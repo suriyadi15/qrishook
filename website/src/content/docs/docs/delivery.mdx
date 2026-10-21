@@ -1,0 +1,36 @@
+---
+title: Pengiriman & retry
+description: Status event, alur pengiriman, dan perilaku retry.
+---
+
+Notifikasi yang cocok disimpan lebih dulu ke database Room, lalu QRIS Hook langsung mencoba mengirimnya dari coroutine latar belakang. `WebhookDeliveryWorker` adalah jalur retry/fallback.
+
+## Alur
+
+1. `NotificationProcessor` membaca pengaturan.
+2. Jika `QRIS Hook Active` mati, notifikasi diabaikan.
+3. Jika `Debug Mode` nyala, payload mentah disimpan dan webhook dilewati.
+4. Pada mode normal, notifikasi dicocokkan dengan parser merchant terpilih.
+5. Setiap event valid dimasukkan antrean dengan status `Pending`.
+6. Event ditandai `Sending` dan dikirim sebagai `POST` JSON.
+7. Respons 2xx → `Sent`. Gagal → `Failed` dan worker retry dijadwalkan.
+
+## Status
+
+| Status | Arti |
+| --- | --- |
+| `Pending` | Sudah masuk antrean, menunggu pengiriman. |
+| `Sending` | Sedang dicoba dikirim. |
+| `Sent` | Webhook membalas 2xx. |
+| `Failed` | Percobaan terakhir gagal; masih akan di-retry. |
+
+## Retry
+
+- Worker memproses event non-`Sent` dari yang terlama, maksimal 10 per batch.
+- Respons non-2xx, error jaringan, URL tidak valid, timeout, dan error network security dicatat sebagai kegagalan (`lastError`, `lastResponseCode`, `attempts`, dll).
+- WorkManager mengulang dengan exponential backoff mulai 30 detik.
+- Belum ada batas maksimum retry; event gagal tetap di antrean sampai terkirim atau data aplikasi dihapus.
+
+:::note
+Jika event baru bertahan di `Pending` lebih dari sesaat, pengiriman langsung tidak berjalan. Pastikan webhook URL sudah tersimpan, lalu tekan **Retry pending** di aplikasi.
+:::
