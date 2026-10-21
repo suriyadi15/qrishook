@@ -134,7 +134,8 @@
     <string name="webhook_url_label">Webhook URL</string>
     <string name="webhook_url_placeholder">https://example.com/qris-webhook</string>
     <string name="webhook_url_invalid">Enter a valid http:// or https:// URL.</string>
-    <string name="webhook_url_insecure">Not encrypted (http). Release builds block http, so use https.</string>
+    <string name="webhook_url_insecure">Not encrypted (http). Fine for local testing only.</string>
+    <string name="webhook_url_cleartext_blocked">http:// is blocked in release builds. Use an https:// URL.</string>
     <string name="webhook_secret_label">Secret (optional)</string>
     <string name="webhook_secret_helper">Sent as the X-Webhook-Secret header.</string>
     <string name="webhook_secret_show">Show</string>

@@ -15,6 +15,18 @@ class WebhookUrlValidatorTest {
     }
 
     @Test
+    fun httpIsBlockedWhenCleartextNotAllowed() {
+        assertEquals(
+            WebhookUrlValidation.CleartextBlocked,
+            WebhookUrlValidator.validate("http://example.com/hook", allowCleartext = false),
+        )
+        assertEquals(
+            WebhookUrlValidation.Valid,
+            WebhookUrlValidator.validate("https://example.com/hook", allowCleartext = false),
+        )
+    }
+
+    @Test
     fun blankIsEmpty() {
         assertEquals(WebhookUrlValidation.Empty, WebhookUrlValidator.validate("   "))
     }

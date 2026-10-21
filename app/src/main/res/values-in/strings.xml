@@ -133,7 +133,8 @@
     <string name="webhook_url_label">URL webhook</string>
     <string name="webhook_url_placeholder">https://contoh.com/qris-webhook</string>
     <string name="webhook_url_invalid">Masukkan URL http:// atau https:// yang valid.</string>
-    <string name="webhook_url_insecure">Tidak terenkripsi (http). Build rilis memblokir http, gunakan https.</string>
+    <string name="webhook_url_insecure">Tidak terenkripsi (http). Hanya untuk uji coba lokal.</string>
+    <string name="webhook_url_cleartext_blocked">http:// diblokir di build rilis. Gunakan URL https://.</string>
     <string name="webhook_secret_label">Secret (opsional)</string>
     <string name="webhook_secret_helper">Dikirim sebagai header X-Webhook-Secret.</string>
     <string name="webhook_secret_show">Tampilkan</string>

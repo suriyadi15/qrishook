@@ -54,6 +54,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import io.github.suriyadi15.qrishook.BuildConfig
 import io.github.suriyadi15.qrishook.R
 import io.github.suriyadi15.qrishook.WebhookTestState
 import io.github.suriyadi15.qrishook.data.AppSettings
@@ -419,7 +420,7 @@ internal fun WebhookEditorSheet(
     }
     var confirmDelete by remember(id) { mutableStateOf(false) }
 
-    val validation = WebhookUrlValidator.validate(url)
+    val validation = WebhookUrlValidator.validate(url, allowCleartext = BuildConfig.DEBUG)
     val canSave = validation is WebhookUrlValidation.Valid || validation is WebhookUrlValidation.Insecure
     val testing = testState is WebhookTestState.Sending
 
@@ -465,10 +466,15 @@ internal fun WebhookEditorSheet(
                 label = { Text(stringResource(R.string.webhook_url_label)) },
                 placeholder = { Text(stringResource(R.string.webhook_url_placeholder)) },
                 singleLine = true,
-                isError = validation is WebhookUrlValidation.Invalid,
+                isError = validation is WebhookUrlValidation.Invalid ||
+                    validation is WebhookUrlValidation.CleartextBlocked,
                 supportingText = when (validation) {
                     WebhookUrlValidation.Invalid -> {
                         { Text(stringResource(R.string.webhook_url_invalid)) }
+                    }
+
+                    WebhookUrlValidation.CleartextBlocked -> {
+                        { Text(stringResource(R.string.webhook_url_cleartext_blocked)) }
                     }
 
                     WebhookUrlValidation.Insecure -> {
