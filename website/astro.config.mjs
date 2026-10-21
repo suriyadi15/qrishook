@@ -40,7 +40,7 @@ export default defineConfig({
           label: "Merchant",
           items: [
             { slug: "docs/merchants", label: "Merchant didukung", translations: { en: "Supported merchants" } },
-            { slug: "docs/request-parser", label: "Request parser", translations: { en: "Request a parser" } },
+            { slug: "docs/request-parser", label: "Ajukan dukungan merchant", translations: { en: "Request merchant support" } },
           ],
         },
         {

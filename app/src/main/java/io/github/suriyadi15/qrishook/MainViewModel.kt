@@ -8,6 +8,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import io.github.suriyadi15.qrishook.data.AppSettings
+import io.github.suriyadi15.qrishook.data.DebugNotificationEntity
+import io.github.suriyadi15.qrishook.issue.MerchantParserRequestInfo
+import io.github.suriyadi15.qrishook.issue.MerchantParserRequestResult
 import io.github.suriyadi15.qrishook.notification.NotificationAccessHelper
 import io.github.suriyadi15.qrishook.notification.WatcherForegroundService
 import io.github.suriyadi15.qrishook.update.AppUpdateState
@@ -29,6 +32,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val historySearchQuery = MutableStateFlow("")
     private val debugSearchQuery = MutableStateFlow("")
     private val updateState = MutableStateFlow<AppUpdateState>(AppUpdateState.Idle)
+    private val parserRequestState = MutableStateFlow<ParserRequestState>(ParserRequestState.Idle)
 
     init {
         loadInstalledApps()
@@ -48,14 +52,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         installedApps,
         historySearchQuery,
         debugSearchQuery,
-        updateState,
-    ) { settings, apps, historyQuery, debugQuery, update ->
+        combine(updateState, parserRequestState) { update, request -> update to request },
+    ) { settings, apps, historyQuery, debugQuery, (update, request) ->
         MainUiState(
             settings = settings,
             installedApps = apps,
             historySearchQuery = historyQuery,
             debugSearchQuery = debugQuery,
             updateState = update,
+            parserRequestState = request,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -95,6 +100,38 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             updateState.value = AppUpdateState.Loading
             updateState.value = graph.updateChecker.check(BuildConfig.VERSION_NAME)
         }
+    }
+
+    fun submitMerchantParserRequest(
+        log: DebugNotificationEntity,
+        expectedDetails: String,
+        contact: String,
+    ) {
+        if (parserRequestState.value is ParserRequestState.Sending) return
+
+        viewModelScope.launch(Dispatchers.IO) {
+            parserRequestState.value = ParserRequestState.Sending
+            val result = graph.merchantParserRequestClient.submit(
+                MerchantParserRequestInfo(
+                    appVersion = BuildConfig.VERSION_NAME,
+                    androidVersion = "Android ${Build.VERSION.RELEASE}, ${Build.MANUFACTURER} ${Build.MODEL}",
+                    merchantAppName = log.sourceApp,
+                    packageName = log.sourcePackage,
+                    debugPayload = log.payloadJson,
+                    expectedDetails = expectedDetails,
+                    contact = contact,
+                ),
+            )
+            parserRequestState.value = when (result) {
+                is MerchantParserRequestResult.Success -> ParserRequestState.Sent(result.id)
+                is MerchantParserRequestResult.Failure -> ParserRequestState.Error(result.message)
+            }
+        }
+    }
+
+    fun resetParserRequest() {
+        if (parserRequestState.value is ParserRequestState.Sending) return
+        parserRequestState.value = ParserRequestState.Idle
     }
 
     fun refresh() {
@@ -151,11 +188,19 @@ data class MainUiState(
     val appVersionName: String = BuildConfig.VERSION_NAME,
     val appVersionCode: Int = BuildConfig.VERSION_CODE,
     val updateState: AppUpdateState = AppUpdateState.Idle,
+    val parserRequestState: ParserRequestState = ParserRequestState.Idle,
     val historySearchQuery: String = "",
     val debugSearchQuery: String = "",
     val notificationAccessGranted: Boolean = false,
     val ignoringBatteryOptimizations: Boolean = false,
 )
+
+sealed interface ParserRequestState {
+    data object Idle : ParserRequestState
+    data object Sending : ParserRequestState
+    data class Sent(val id: Int) : ParserRequestState
+    data class Error(val message: String) : ParserRequestState
+}
 
 data class InstalledAppInfo(
     val packageName: String,

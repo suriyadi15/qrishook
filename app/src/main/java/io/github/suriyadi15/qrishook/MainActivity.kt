@@ -2,8 +2,6 @@ package io.github.suriyadi15.qrishook
 
 import android.Manifest
 import android.content.ActivityNotFoundException
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -12,7 +10,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.compose.setContent
@@ -23,9 +20,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.paging.compose.collectAsLazyPagingItems
-import io.github.suriyadi15.qrishook.data.DebugNotificationEntity
-import io.github.suriyadi15.qrishook.issue.MerchantParserIssueInfo
-import io.github.suriyadi15.qrishook.issue.MerchantParserIssueUrl
 import io.github.suriyadi15.qrishook.notification.NotificationAccessHelper
 import io.github.suriyadi15.qrishook.ui.QrisHookScreen
 import io.github.suriyadi15.qrishook.ui.QrisHookTheme
@@ -75,7 +69,8 @@ class MainActivity : ComponentActivity() {
                     onOpenGitHub = {
                         startActivitySafely(Intent(Intent.ACTION_VIEW, Uri.parse(PROJECT_URL)))
                     },
-                    onOpenMerchantParserRequest = ::openMerchantParserRequest,
+                    onSubmitMerchantParserRequest = viewModel::submitMerchantParserRequest,
+                    onResetMerchantParserRequest = viewModel::resetParserRequest,
                     onCheckForUpdates = viewModel::checkForUpdates,
                     onOpenUpdate = { url ->
                         startActivitySafely(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
@@ -118,32 +113,6 @@ class MainActivity : ComponentActivity() {
         } catch (_: ActivityNotFoundException) {
             startActivity(Intent(Settings.ACTION_SETTINGS))
         }
-    }
-
-    private fun openMerchantParserRequest(log: DebugNotificationEntity?) {
-        val link = MerchantParserIssueUrl.build(
-            MerchantParserIssueInfo(
-                appVersion = BuildConfig.VERSION_NAME,
-                androidVersion = "Android ${Build.VERSION.RELEASE}, ${Build.MANUFACTURER} ${Build.MODEL}",
-                merchantAppName = log?.sourceApp,
-                packageName = log?.sourcePackage,
-                debugPayload = log?.payloadJson,
-            ),
-        )
-
-        if (log != null) {
-            val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            clipboard.setPrimaryClip(ClipData.newPlainText("Notification payload", log.payloadJson))
-            if (!link.payloadIncluded) {
-                Toast.makeText(
-                    this,
-                    "Payload too large for the link and was copied. Paste it into the debug payload field.",
-                    Toast.LENGTH_LONG,
-                ).show()
-            }
-        }
-
-        startActivitySafely(Intent(Intent.ACTION_VIEW, Uri.parse(link.url)))
     }
 
     private fun requestNotificationPermissionIfNeeded() {

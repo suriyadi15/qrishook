@@ -1,5 +1,5 @@
 ---
-title: Request a parser
+title: Request merchant support
 description: Capture a debug payload to request a new merchant.
 ---
 
@@ -9,13 +9,11 @@ Notification formats vary between apps and versions. To request support for a ne
 2. Open QRIS Hook and turn on `Debug Mode`.
 3. Select the merchant app to capture.
 4. Trigger a real or test QRIS notification from that app.
-5. Open `Debug Logs`, open the captured log, and tap `Copy`.
-6. Create a [Merchant parser request](https://github.com/suriyadi15/qrishook/issues/new?template=merchant_parser_request.yml) issue with:
-   - merchant app name
-   - package name
-   - expected payment details
-   - the copied debug payload
+5. Open `Debug Logs`, open the captured log, and tap `Request support`.
+6. Fill in the expected payment details and a contact (both optional), tick the confirmation, and tap `Send`.
+
+The request is sent straight from the app with the merchant app name, package name, debug payload, QRIS Hook version, and Android version. **No GitHub account is needed.** After it is sent you will see a request number.
 
 :::caution
-The debug payload is **required**; requests without one can't be implemented reliably. Before posting, redact sensitive data such as customer names, phone numbers, account identifiers, transaction IDs, and other private information.
+The debug payload is sent as is. It can contain customer names, amounts, or transaction IDs from the original notification, so prefer a test notification when possible. Requests are only visible to the maintainers.
 :::

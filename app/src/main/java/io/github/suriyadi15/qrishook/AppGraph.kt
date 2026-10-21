@@ -8,6 +8,7 @@ import io.github.suriyadi15.qrishook.data.AppDatabase
 import io.github.suriyadi15.qrishook.data.DebugNotificationRepository
 import io.github.suriyadi15.qrishook.data.EventRepository
 import io.github.suriyadi15.qrishook.data.SettingsRepository
+import io.github.suriyadi15.qrishook.issue.MerchantParserRequestClient
 import io.github.suriyadi15.qrishook.merchant.QrisNotificationMatcher
 import io.github.suriyadi15.qrishook.update.GitHubUpdateChecker
 import io.github.suriyadi15.qrishook.webhook.WebhookClient
@@ -39,6 +40,7 @@ object AppGraph {
         val webhookClient = WebhookClient()
         val webhookDeliveryRunner = WebhookDeliveryRunner(eventRepository, webhookClient)
         val updateChecker = GitHubUpdateChecker()
+        val merchantParserRequestClient = MerchantParserRequestClient()
         val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     }
 

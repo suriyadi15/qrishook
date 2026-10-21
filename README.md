@@ -255,16 +255,23 @@ Notification formats vary between merchant apps and app versions. If QRIS Hook d
 3. Select the merchant app you want to capture.
 4. Trigger a real or test QRIS notification from that merchant app.
 5. Open `Debug Logs` in QRIS Hook.
-6. Open the captured log and tap `Copy`.
-7. Create a `Merchant parser request` GitHub issue with:
-   - merchant app name
-   - package name
-   - expected payment details
-   - copied debug payload from QRIS Hook `Debug Mode`
+6. Open the captured log and tap `Request support`.
+7. Optionally add the expected payment details and a contact, confirm, and tap `Send`.
 
-The copied debug payload is required. Parser requests without a debug payload cannot be implemented reliably.
+The request is sent directly from the app, so no GitHub account is needed. The debug payload is always included, because merchant support requests without one cannot be implemented reliably. It is sent as is and can contain customer names or transaction IDs, so prefer a test notification when possible.
 
-Before posting the issue, redact sensitive data such as customer names, phone numbers, account identifiers, transaction IDs, or any other private information.
+Developers can still open a `Merchant parser request` GitHub issue manually using the issue template.
+
+### Merchant request backend
+
+The app posts to a Cloudflare Pages Function (`website/functions/api/merchant-request.ts`), which creates an issue in a private GitHub repository. Configure these in Cloudflare Pages → Settings → Variables and Secrets:
+
+- `GITHUB_TOKEN`: fine-grained personal access token limited to the private requests repository, with `Issues: Read and write`.
+- `GITHUB_REPO`: the private repository, for example `suriyadi15/qrishook-requests`.
+
+The function limits each IP to 5 requests per hour using the Cache API, so no paid Cloudflare plan or extra binding is needed. This is best-effort per data center, not a hard guarantee.
+
+For local development, put the variables in `website/.dev.vars` (git-ignored) and run `npx wrangler pages dev dist`.
 
 ## License
 

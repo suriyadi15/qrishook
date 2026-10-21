@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -59,6 +60,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import io.github.suriyadi15.qrishook.InstalledAppInfo
 import io.github.suriyadi15.qrishook.MainUiState
+import io.github.suriyadi15.qrishook.ParserRequestState
 import io.github.suriyadi15.qrishook.data.AppSettings
 import io.github.suriyadi15.qrishook.data.DebugNotificationEntity
 import io.github.suriyadi15.qrishook.data.EventEntity
@@ -81,7 +83,8 @@ fun QrisHookScreen(
     onOpenAppInfo: () -> Unit,
     onRequestIgnoreBatteryOptimizations: () -> Unit,
     onOpenGitHub: () -> Unit,
-    onOpenMerchantParserRequest: (DebugNotificationEntity?) -> Unit,
+    onSubmitMerchantParserRequest: (DebugNotificationEntity, String, String) -> Unit,
+    onResetMerchantParserRequest: () -> Unit,
     onCheckForUpdates: () -> Unit,
     onOpenUpdate: (String) -> Unit,
     onTestDelivery: () -> Unit,
@@ -90,6 +93,7 @@ fun QrisHookScreen(
     var selectedDestination by rememberSaveable { mutableStateOf(MainDestination.Home) }
     var selectedDebugLog by remember { mutableStateOf<DebugNotificationEntity?>(null) }
     var selectedEvent by remember { mutableStateOf<EventEntity?>(null) }
+    var requestParserLog by remember { mutableStateOf<DebugNotificationEntity?>(null) }
 
     Scaffold(
         topBar = {
@@ -157,7 +161,6 @@ fun QrisHookScreen(
                 onSearchChange = onDebugSearchChange,
                 onDebugLogClick = { selectedDebugLog = it },
                 onClearDebugLogs = onClearDebugLogs,
-                onOpenMerchantParserRequest = onOpenMerchantParserRequest,
             )
         }
     }
@@ -168,7 +171,19 @@ fun QrisHookScreen(
             onDismiss = { selectedDebugLog = null },
             onRequestParser = {
                 selectedDebugLog = null
-                onOpenMerchantParserRequest(log)
+                requestParserLog = log
+            },
+        )
+    }
+
+    requestParserLog?.let { log ->
+        MerchantRequestDialog(
+            log = log,
+            state = state.parserRequestState,
+            onSubmit = { expected, contact -> onSubmitMerchantParserRequest(log, expected, contact) },
+            onDismiss = {
+                requestParserLog = null
+                onResetMerchantParserRequest()
             },
         )
     }
@@ -341,7 +356,6 @@ private fun DebugModeScreen(
     onSearchChange: (String) -> Unit,
     onDebugLogClick: (DebugNotificationEntity) -> Unit,
     onClearDebugLogs: () -> Unit,
-    onOpenMerchantParserRequest: (DebugNotificationEntity?) -> Unit,
 ) {
     var showAppPicker by remember { mutableStateOf(false) }
 
@@ -360,9 +374,7 @@ private fun DebugModeScreen(
             )
         }
         item {
-            MerchantParserContributionSection(
-                onOpenMerchantParserRequest = { onOpenMerchantParserRequest(null) },
-            )
+            MerchantParserContributionSection()
         }
         item {
             DebugLogHeader(
@@ -774,20 +786,18 @@ private fun DebugSettingsSection(
 }
 
 @Composable
-private fun MerchantParserContributionSection(
-    onOpenMerchantParserRequest: () -> Unit,
-) {
+private fun MerchantParserContributionSection() {
     Section {
-        Text("Request a Merchant Parser", fontWeight = FontWeight.SemiBold)
+        Text("Request Merchant Support", fontWeight = FontWeight.SemiBold)
         Spacer(Modifier.height(8.dp))
         Text(
-            "To support a new merchant, the issue must include a debug payload copied from QRIS Hook.",
+            "To get a new merchant supported, the request must include a debug payload captured by QRIS Hook. We use it to add support for that merchant app.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.secondary,
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            "Turn on Debug Mode, select the merchant app, make a real or test QRIS payment, open the captured debug log, then tap Request parser. The GitHub issue form will be prefilled with the app, package, payload, and device details.",
+            "Turn on Debug Mode, select the merchant app, make a real or test QRIS payment, open the captured debug log, then tap Request merchant support. The request is sent directly from the app, together with the app, package, payload, and device details. No GitHub account is needed.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.secondary,
         )
@@ -797,10 +807,6 @@ private fun MerchantParserContributionSection(
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.secondary,
         )
-        Spacer(Modifier.height(12.dp))
-        OutlinedButton(onClick = onOpenMerchantParserRequest) {
-            Text("Open parser request")
-        }
     }
 }
 
@@ -998,6 +1004,94 @@ private fun DebugLogRow(
 }
 
 @Composable
+private fun MerchantRequestDialog(
+    log: DebugNotificationEntity,
+    state: ParserRequestState,
+    onSubmit: (expectedDetails: String, contact: String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var expectedDetails by rememberSaveable { mutableStateOf("") }
+    var contact by rememberSaveable { mutableStateOf("") }
+    var confirmed by rememberSaveable { mutableStateOf(false) }
+    val sending = state is ParserRequestState.Sending
+    val sent = state is ParserRequestState.Sent
+
+    AlertDialog(
+        onDismissRequest = { if (!sending) onDismiss() },
+        title = { Text("Request merchant support") },
+        text = {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                if (state is ParserRequestState.Sent) {
+                    Text("Request sent as #${state.id}. Thank you for helping QRIS Hook support more merchants.")
+                } else {
+                    Text(log.sourceApp, fontWeight = FontWeight.Medium)
+                    Text(
+                        log.sourcePackage,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.secondary,
+                    )
+                    OutlinedTextField(
+                        value = expectedDetails,
+                        onValueChange = { expectedDetails = it },
+                        enabled = !sending,
+                        label = { Text("Expected payment details (optional)") },
+                        placeholder = { Text("Amount, sender name, payment source, received time") },
+                        minLines = 3,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    OutlinedTextField(
+                        value = contact,
+                        onValueChange = { contact = it },
+                        enabled = !sending,
+                        label = { Text("Email or WhatsApp (optional)") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.clickable(enabled = !sending) { confirmed = !confirmed },
+                    ) {
+                        Checkbox(checked = confirmed, onCheckedChange = null, enabled = !sending)
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            "I reviewed the payload and accept that it is sent as is, including any customer names or transaction IDs it contains.",
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
+                    if (state is ParserRequestState.Error) {
+                        Text(
+                            state.message,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            if (sent) {
+                TextButton(onClick = onDismiss) { Text("Tutup") }
+            } else {
+                TextButton(
+                    onClick = { onSubmit(expectedDetails, contact) },
+                    enabled = confirmed && !sending,
+                ) {
+                    Text(if (sending) "Sending..." else "Send")
+                }
+            }
+        },
+        dismissButton = {
+            if (!sent) {
+                TextButton(onClick = onDismiss, enabled = !sending) { Text("Batal") }
+            }
+        },
+    )
+}
+
+@Composable
 private fun DebugPayloadDialog(
     log: DebugNotificationEntity,
     onDismiss: () -> Unit,
@@ -1020,7 +1114,7 @@ private fun DebugPayloadDialog(
         confirmButton = {
             Row {
                 TextButton(onClick = onRequestParser) {
-                    Text("Request parser")
+                    Text("Request support")
                 }
                 TextButton(
                     onClick = {
