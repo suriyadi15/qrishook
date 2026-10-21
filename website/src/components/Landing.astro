@@ -1,7 +1,7 @@
 ---
 import { Image } from "astro:assets";
 import { Code } from "astro-expressive-code/components";
-import { dict, merchants, payload, REPO, RELEASES, REQUEST_PARSER, type Locale } from "../i18n/landing";
+import { dict, merchants, payload, REPO, RELEASES, type Locale } from "../i18n/landing";
 import s1 from "../assets/screenshots/1.jpg";
 import s2 from "../assets/screenshots/2.jpg";
 import s3 from "../assets/screenshots/3.jpg";
@@ -112,7 +112,8 @@ const shots = [s1, s2, s3, s4, s5, s6, s7];
             <li class="card"><h3>{m.name}</h3><code>{m.pkg}</code></li>
           ))}
         </ul>
-        <a class="btn" href={REQUEST_PARSER} rel="noopener">{t.requestParser}</a>
+        <a class="btn" href={t.requestParserHref}>{t.requestParser}</a>
+        <p class="muted">{t.requestParserHint}</p>
       </section>
 
       <section class="sec">

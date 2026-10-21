@@ -2,7 +2,6 @@ export type Locale = "id" | "en";
 
 export const REPO = "https://github.com/suriyadi15/qrishook";
 export const RELEASES = `${REPO}/releases/latest`;
-export const REQUEST_PARSER = `${REPO}/issues/new?template=merchant_parser_request.yml`;
 
 export const merchants = [
   { name: "BRI Merchant", pkg: "id.co.bri.merchant" },
@@ -63,6 +62,8 @@ const id = {
   merchantsTitle: "Merchant yang didukung",
   merchantsSub: "Aplikasi Anda belum ada? Kirim payload dari Debug Mode agar aplikasi Anda didukung.",
   requestParser: "Ajukan dukungan merchant",
+  requestParserHref: "/docs/request-parser/",
+  requestParserHint: "Dikirim langsung dari aplikasi, tanpa akun GitHub.",
   screensTitle: "Tampilan aplikasi",
   ctaTitle: "Siap menerima webhook pembayaran?",
   ctaSub: "Download APK terbaru dari GitHub Releases, atau build sendiri dari source.",
@@ -111,6 +112,8 @@ const en = {
   merchantsTitle: "Supported merchants",
   merchantsSub: "Your app isn't listed? Send a Debug Mode payload to get it supported.",
   requestParser: "Request merchant support",
+  requestParserHref: "/en/docs/request-parser/",
+  requestParserHint: "Sent straight from the app, no GitHub account needed.",
   screensTitle: "App screenshots",
   ctaTitle: "Ready to receive payment webhooks?",
   ctaSub: "Download the latest APK from GitHub Releases, or build it from source.",
