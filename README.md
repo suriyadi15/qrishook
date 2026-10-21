@@ -264,10 +264,10 @@ Developers can still open a `Merchant parser request` GitHub issue manually usin
 
 ### Merchant request backend
 
-The app posts to a Cloudflare Pages Function (`website/functions/api/merchant-request.ts`), which creates an issue in a private GitHub repository. Configure these in Cloudflare Pages → Settings → Variables and Secrets:
+The app posts to a Cloudflare Pages Function (`website/functions/api/merchant-request.ts`), which creates an issue in a private GitHub repository. Configuration:
 
-- `GITHUB_TOKEN`: fine-grained personal access token limited to the private requests repository, with `Issues: Read and write`.
-- `GITHUB_REPO`: the private repository, for example `suriyadi15/qrishook-requests`.
+- `GITHUB_TOKEN` (Cloudflare Pages secret): fine-grained personal access token limited to the private requests repository, with `Issues: Read and write`.
+- `GITHUB_REPO`: the private repository (`suriyadi15/qrishook-requests`). It is set in `website/wrangler.jsonc` because the Pages project is managed by that file; dashboard variables are ignored, and only secrets can be edited in the dashboard.
 
 The function limits each IP to 5 requests per hour using the Cache API, so no paid Cloudflare plan or extra binding is needed. This is best-effort per data center, not a hard guarantee.
 
