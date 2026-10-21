@@ -10,10 +10,12 @@ Notification formats vary between apps and versions. To request support for a ne
 3. Select the merchant app to capture.
 4. Trigger a real or test QRIS notification from that app.
 5. Open `Debug Logs`, open the captured log, and tap `Request support`.
-6. Fill in the expected payment details and a contact (both optional), tick the confirmation, and tap `Send`.
+6. Fill in the expected payment details and a contact (both optional).
+7. Review the `Debug payload` field. Long numbers and emails are already masked. Replace customer names with `[NAME]`.
+8. Tick the confirmation and tap `Send`.
 
-The request is sent straight from the app with the merchant app name, package name, debug payload, QRIS Hook version, and Android version. **No GitHub account is needed.** After it is sent you will see a request number.
+The request is sent straight from the app with the merchant app name, package name, edited debug payload, QRIS Hook version, and Android version. **No GitHub account is needed.** After it is sent you will see a request number.
 
 :::caution
-The debug payload is sent as is. It can contain customer names, amounts, or transaction IDs from the original notification, so prefer a test notification when possible. Requests are only visible to the maintainers.
+Automatic masking cannot recognize customer names. Review the payload before sending, and prefer a test notification when possible. Requests are only visible to the maintainer and are handled under the [Privacy policy](/en/docs/privacy/).
 :::

@@ -49,6 +49,7 @@ export default defineConfig({
           items: [
             { slug: "docs/add-parser", label: "Menambah parser", translations: { en: "Adding a parser" } },
             { slug: "docs/build", label: "Build & rilis", translations: { en: "Build & release" } },
+            { slug: "docs/privacy", label: "Kebijakan privasi", translations: { en: "Privacy policy" } },
             { slug: "docs/disclaimer", label: "Disclaimer & lisensi", translations: { en: "Disclaimer & license" } },
           ],
         },

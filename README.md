@@ -42,6 +42,14 @@ extent permitted by law, the author and contributors are not liable for any
 claim, damage, loss, service interruption, data loss, or other liability arising
 from the use, misuse, inability to use, or distribution of this software.
 
+### Trademarks
+
+QRIS Hook is an independent project and is not affiliated with, endorsed by, or
+sponsored by Bank Indonesia, ASPI, PT Bank Rakyat Indonesia (Persero) Tbk,
+GoTo/GoPay, or the InterActive QRIS provider. QRIS and all merchant app names
+are trademarks of their respective owners and are mentioned only to describe
+compatibility.
+
 ## Features
 
 - Notification monitoring with `NotificationListenerService`.
@@ -256,9 +264,10 @@ Notification formats vary between merchant apps and app versions. If QRIS Hook d
 4. Trigger a real or test QRIS notification from that merchant app.
 5. Open `Debug Logs` in QRIS Hook.
 6. Open the captured log and tap `Request support`.
-7. Optionally add the expected payment details and a contact, confirm, and tap `Send`.
+7. Optionally add the expected payment details and a contact.
+8. Review the `Debug payload` field, replace customer names with `[NAME]`, confirm, and tap `Send`.
 
-The request is sent directly from the app, so no GitHub account is needed. The debug payload is always included, because merchant support requests without one cannot be implemented reliably. It is sent as is and can contain customer names or transaction IDs, so prefer a test notification when possible.
+The request is sent directly from the app, so no GitHub account is needed. The debug payload is always included, because merchant support requests without one cannot be implemented reliably. Before it is shown, `PayloadRedactor` masks long digit sequences (transaction IDs, account and phone numbers), email addresses, and person/message extras. Customer names cannot be detected automatically, so the payload stays editable; prefer a test notification when possible. Requests are handled under the [Privacy policy](https://qrishook.pages.dev/en/docs/privacy/).
 
 Developers can still open a `Merchant parser request` GitHub issue manually using the issue template.
 

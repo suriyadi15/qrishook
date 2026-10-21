@@ -106,6 +106,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         log: DebugNotificationEntity,
         expectedDetails: String,
         contact: String,
+        debugPayload: String,
     ) {
         if (parserRequestState.value is ParserRequestState.Sending) return
 
@@ -117,7 +118,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     androidVersion = "Android ${Build.VERSION.RELEASE}, ${Build.MANUFACTURER} ${Build.MODEL}",
                     merchantAppName = log.sourceApp,
                     packageName = log.sourcePackage,
-                    debugPayload = log.payloadJson,
+                    debugPayload = debugPayload,
                     expectedDetails = expectedDetails,
                     contact = contact,
                 ),

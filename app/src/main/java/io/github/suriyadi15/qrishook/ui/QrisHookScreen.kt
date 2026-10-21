@@ -53,6 +53,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -64,11 +65,15 @@ import io.github.suriyadi15.qrishook.ParserRequestState
 import io.github.suriyadi15.qrishook.data.AppSettings
 import io.github.suriyadi15.qrishook.data.DebugNotificationEntity
 import io.github.suriyadi15.qrishook.data.EventEntity
+import io.github.suriyadi15.qrishook.issue.PayloadRedactor
 import io.github.suriyadi15.qrishook.merchant.MerchantRegistry
 import io.github.suriyadi15.qrishook.update.AppUpdateState
 import io.github.suriyadi15.qrishook.webhook.WebhookPayloadBuilder
+import org.json.JSONObject
 import java.text.DateFormat
 import java.util.Date
+
+private const val PRIVACY_POLICY_URL = "https://qrishook.pages.dev/docs/privacy/"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -83,7 +88,7 @@ fun QrisHookScreen(
     onOpenAppInfo: () -> Unit,
     onRequestIgnoreBatteryOptimizations: () -> Unit,
     onOpenGitHub: () -> Unit,
-    onSubmitMerchantParserRequest: (DebugNotificationEntity, String, String) -> Unit,
+    onSubmitMerchantParserRequest: (DebugNotificationEntity, String, String, String) -> Unit,
     onResetMerchantParserRequest: () -> Unit,
     onCheckForUpdates: () -> Unit,
     onOpenUpdate: (String) -> Unit,
@@ -180,7 +185,9 @@ fun QrisHookScreen(
         MerchantRequestDialog(
             log = log,
             state = state.parserRequestState,
-            onSubmit = { expected, contact -> onSubmitMerchantParserRequest(log, expected, contact) },
+            onSubmit = { expected, contact, payload ->
+                onSubmitMerchantParserRequest(log, expected, contact, payload)
+            },
             onDismiss = {
                 requestParserLog = null
                 onResetMerchantParserRequest()
@@ -1007,12 +1014,15 @@ private fun DebugLogRow(
 private fun MerchantRequestDialog(
     log: DebugNotificationEntity,
     state: ParserRequestState,
-    onSubmit: (expectedDetails: String, contact: String) -> Unit,
+    onSubmit: (expectedDetails: String, contact: String, debugPayload: String) -> Unit,
     onDismiss: () -> Unit,
 ) {
+    val uriHandler = LocalUriHandler.current
     var expectedDetails by rememberSaveable { mutableStateOf("") }
     var contact by rememberSaveable { mutableStateOf("") }
+    var payload by rememberSaveable { mutableStateOf(PayloadRedactor.redact(log.payloadJson)) }
     var confirmed by rememberSaveable { mutableStateOf(false) }
+    val payloadValid = remember(payload) { runCatching { JSONObject(payload) }.isSuccess }
     val sending = state is ParserRequestState.Sending
     val sent = state is ParserRequestState.Sent
 
@@ -1050,6 +1060,25 @@ private fun MerchantRequestDialog(
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                     )
+                    OutlinedTextField(
+                        value = payload,
+                        onValueChange = { payload = it },
+                        enabled = !sending,
+                        label = { Text("Debug payload") },
+                        isError = !payloadValid,
+                        supportingText = {
+                            Text(
+                                if (payloadValid) {
+                                    "Long numbers and emails were masked. Replace any customer names with [NAME] before sending."
+                                } else {
+                                    "Payload must be valid JSON."
+                                },
+                            )
+                        },
+                        textStyle = MaterialTheme.typography.bodySmall,
+                        maxLines = 10,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.clickable(enabled = !sending) { confirmed = !confirmed },
@@ -1057,9 +1086,12 @@ private fun MerchantRequestDialog(
                         Checkbox(checked = confirmed, onCheckedChange = null, enabled = !sending)
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            "I reviewed the payload and accept that it is sent as is, including any customer names or transaction IDs it contains.",
+                            "I reviewed and edited the payload. I agree it is sent to the QRIS Hook maintainer and handled as described in the Privacy Policy.",
                             style = MaterialTheme.typography.bodySmall,
                         )
+                    }
+                    TextButton(onClick = { uriHandler.openUri(PRIVACY_POLICY_URL) }) {
+                        Text("Read Privacy Policy")
                     }
                     if (state is ParserRequestState.Error) {
                         Text(
@@ -1076,8 +1108,8 @@ private fun MerchantRequestDialog(
                 TextButton(onClick = onDismiss) { Text("Tutup") }
             } else {
                 TextButton(
-                    onClick = { onSubmit(expectedDetails, contact) },
-                    enabled = confirmed && !sending,
+                    onClick = { onSubmit(expectedDetails, contact, payload) },
+                    enabled = confirmed && payloadValid && !sending,
                 ) {
                     Text(if (sending) "Sending..." else "Send")
                 }

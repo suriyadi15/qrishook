@@ -1,0 +1,46 @@
+---
+title: Kebijakan privasi
+description: Data apa yang diproses QRIS Hook dan ke mana data itu dikirim.
+---
+
+QRIS Hook tidak memiliki akun, analytics, maupun pelacakan. Bagian ini menjelaskan satu-satunya data yang dikirim ke maintainer, yaitu saat Anda menekan `Request support`.
+
+## Data yang tetap di perangkat Anda
+
+Notifikasi, riwayat event, log debug, URL webhook, dan secret disimpan di perangkat. Event pembayaran hanya dikirim ke URL webhook yang **Anda** atur sendiri. Maintainer tidak pernah menerima data ini.
+
+Aplikasi juga menghubungi GitHub API untuk memeriksa versi terbaru. Permintaan itu tidak membawa data notifikasi.
+
+## Data yang dikirim saat Request support
+
+Saat Anda mengirim request dukungan merchant, aplikasi mengirim:
+
+- nama dan package name aplikasi merchant,
+- payload debug **setelah disamarkan dan Anda sunting**,
+- detail pembayaran yang diharapkan dan kontak, jika Anda mengisinya,
+- versi QRIS Hook serta versi dan model Android.
+
+Sebelum dikirim, aplikasi otomatis menyamarkan deretan angka panjang (ID transaksi, nomor rekening, nomor HP) dan alamat email. Nama pelanggan tidak bisa dideteksi otomatis, jadi ganti sendiri dengan `[NAME]` sebelum menekan `Send`. Sebisa mungkin gunakan notifikasi uji.
+
+## Tujuan dan dasar pemrosesan
+
+Data hanya dipakai untuk membuat atau memperbaiki parser merchant. Dasarnya adalah persetujuan Anda, yang diberikan lewat kotak konfirmasi sebelum mengirim.
+
+## Pemroses data
+
+- **Cloudflare Pages** menerima request. Alamat IP dipakai untuk membatasi spam (maks. 5 request per jam) dan dibuang setelah paling lama 1 jam.
+- **GitHub** menyimpan request sebagai issue di repository privat yang hanya bisa dibuka maintainer.
+
+Data tidak dijual atau dibagikan ke pihak lain.
+
+## Retensi
+
+Request dihapus paling lambat 30 hari setelah parser untuk merchant tersebut dirilis atau setelah request ditutup.
+
+## Hak Anda
+
+Anda dapat meminta salinan, perbaikan, atau penghapusan request kapan saja. Hubungi maintainer melalui [github.com/suriyadi15](https://github.com/suriyadi15) dan sebutkan nomor request yang muncul setelah pengiriman. Request akan dihapus tanpa perlu alasan.
+
+## Perubahan
+
+Kebijakan ini dapat diperbarui seiring perubahan aplikasi. Versi terbaru selalu ada di halaman ini.

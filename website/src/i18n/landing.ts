@@ -71,6 +71,9 @@ const id = {
   disclaimer:
     "QRIS Hook hanya untuk pemantauan notifikasi yang sah, pada perangkat, akun merchant, dan endpoint yang Anda berhak akses. Anda bertanggung jawab penuh atas penggunaannya. Perangkat lunak disediakan \"apa adanya\" tanpa garansi.",
   disclaimerMore: "Selengkapnya",
+  trademark:
+    "Proyek independen, tidak berafiliasi dengan Bank Indonesia, ASPI, maupun penyedia aplikasi merchant. QRIS dan nama merchant adalah merek milik pemiliknya masing-masing.",
+  privacy: "Kebijakan privasi",
   license: "Dirilis dengan Lisensi MIT.",
 } as const;
 
@@ -121,6 +124,9 @@ const en = {
   disclaimer:
     "QRIS Hook is for lawful notification monitoring on devices, merchant accounts and endpoints you have the right to access. You are solely responsible for its use. The software is provided \"as is\", without warranty.",
   disclaimerMore: "Read more",
+  trademark:
+    "Independent project, not affiliated with Bank Indonesia, ASPI, or any merchant app provider. QRIS and merchant names are trademarks of their respective owners.",
+  privacy: "Privacy policy",
   license: "Released under the MIT License.",
 } as const;
 

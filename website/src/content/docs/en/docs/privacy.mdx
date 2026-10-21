@@ -1,0 +1,46 @@
+---
+title: Privacy policy
+description: What data QRIS Hook processes and where it goes.
+---
+
+QRIS Hook has no accounts, analytics, or tracking. This page covers the only data that is ever sent to the maintainer: what you send with `Request support`.
+
+## Data that stays on your device
+
+Notifications, event history, debug logs, the webhook URL, and the secret are stored on your device. Payment events are only sent to the webhook URL that **you** configure. The maintainer never receives this data.
+
+The app also calls the GitHub API to check for new versions. That request carries no notification data.
+
+## Data sent with Request support
+
+When you send a merchant support request, the app sends:
+
+- the merchant app name and package name,
+- the debug payload **after it is masked and edited by you**,
+- the expected payment details and a contact, if you fill them in,
+- the QRIS Hook version and the Android version and device model.
+
+Before sending, the app automatically masks long digit sequences (transaction IDs, account numbers, phone numbers) and email addresses. Customer names cannot be detected automatically, so replace them with `[NAME]` yourself before tapping `Send`. Prefer a test notification when possible.
+
+## Purpose and legal basis
+
+The data is only used to build or fix merchant parsers. It is processed on the basis of your consent, given through the confirmation checkbox before sending.
+
+## Processors
+
+- **Cloudflare Pages** receives the request. Your IP address is used for spam limiting (up to 5 requests per hour) and is discarded after at most 1 hour.
+- **GitHub** stores the request as an issue in a private repository that only the maintainer can open.
+
+The data is not sold or shared with anyone else.
+
+## Retention
+
+Requests are deleted no later than 30 days after a parser for that merchant is released or the request is closed.
+
+## Your rights
+
+You can ask for a copy, correction, or deletion of your request at any time. Contact the maintainer at [github.com/suriyadi15](https://github.com/suriyadi15) and include the request number shown after sending. The request will be deleted, no reason needed.
+
+## Changes
+
+This policy may be updated as the app changes. The latest version is always on this page.

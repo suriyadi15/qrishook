@@ -10,10 +10,12 @@ Format notifikasi berbeda antar aplikasi dan versi. Untuk meminta dukungan merch
 3. Pilih aplikasi merchant yang ingin ditangkap.
 4. Picu notifikasi QRIS asli atau uji dari aplikasi tersebut.
 5. Buka `Debug Logs`, pilih log yang tertangkap, lalu tekan `Request support`.
-6. Isi detail pembayaran yang diharapkan dan kontak (keduanya opsional), centang konfirmasi, lalu tekan `Send`.
+6. Isi detail pembayaran yang diharapkan dan kontak (keduanya opsional).
+7. Periksa field `Debug payload`. Angka panjang dan email sudah disamarkan otomatis. Ganti nama pelanggan dengan `[NAME]`.
+8. Centang konfirmasi, lalu tekan `Send`.
 
-Request dikirim langsung dari aplikasi bersama nama aplikasi, package name, payload debug, versi QRIS Hook, dan versi Android. **Tidak perlu akun GitHub.** Setelah terkirim, Anda akan melihat nomor request.
+Request dikirim langsung dari aplikasi bersama nama aplikasi, package name, payload debug yang sudah disunting, versi QRIS Hook, dan versi Android. **Tidak perlu akun GitHub.** Setelah terkirim, Anda akan melihat nomor request.
 
 :::caution
-Payload debug dikirim apa adanya. Payload bisa berisi nama pelanggan, nominal, atau ID transaksi dari notifikasi asli, jadi gunakan notifikasi uji bila memungkinkan. Request hanya dapat dilihat oleh maintainer.
+Penyamaran otomatis tidak bisa mengenali nama pelanggan. Periksa payload sebelum mengirim, dan gunakan notifikasi uji bila memungkinkan. Request hanya dapat dilihat oleh maintainer dan diproses sesuai [Kebijakan privasi](/docs/privacy/).
 :::
