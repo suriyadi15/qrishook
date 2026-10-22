@@ -1,7 +1,7 @@
 ---
 import { Image } from "astro:assets";
 import { Code } from "astro-expressive-code/components";
-import { dict, merchants, payload, REPO, RELEASES, SPONSOR, TRAKTEER, type Locale } from "../i18n/landing";
+import { dict, merchants, payload, REPO, RELEASES, SPONSOR, TRAKTEER, QRISNAMIS_WEB, QRISNAMIS_REPO, QRISNAMIS_OG, type Locale } from "../i18n/landing";
 import s1 from "../assets/screenshots/1.jpg";
 import s2 from "../assets/screenshots/2.jpg";
 import s3 from "../assets/screenshots/3.jpg";
@@ -91,6 +91,7 @@ const jsonLd = {
             <a href="#how">{t.nav.how}</a>
             <a href="#merchants">{t.nav.merchants}</a>
             <a href={t.docsBase}>{t.nav.docs}</a>
+            <a href="#related">{t.nav.related}</a>
             <a href="#support">{t.nav.support}</a>
           </div>
           <a href={t.other.href} class="lang" hreflang={locale === "id" ? "en" : "id"}>{t.other.label}</a>
@@ -174,6 +175,22 @@ const jsonLd = {
           <a class="btn primary" href={RELEASES} rel="noopener">{t.hero.download}</a>
           <a class="btn gh" href={REPO} rel="noopener"><Fragment set:html={ghIcon} />{t.build}</a>
         </div>
+      </section>
+
+      <section id="related" class="wrap sec">
+        <h2>{t.related.title}</h2>
+        <p class="muted">{t.related.sub}</p>
+        <article class="card related">
+          <a href={QRISNAMIS_WEB} rel="noopener"><img src={QRISNAMIS_OG} alt={t.related.imgAlt} width="1200" height="630" loading="lazy" /></a>
+          <div class="body">
+            <h3>qrisnamis</h3>
+            <p>{t.related.body}</p>
+            <div class="cta">
+              <a class="btn primary" href={QRISNAMIS_WEB} rel="noopener">{t.related.web}</a>
+              <a class="btn gh" href={QRISNAMIS_REPO} rel="noopener"><Fragment set:html={ghIcon} />{t.related.repo}</a>
+            </div>
+          </div>
+        </article>
       </section>
 
       <section id="support" class="wrap sec final">
@@ -267,6 +284,16 @@ const jsonLd = {
   code { font-family: ui-monospace, monospace; font-size: 0.85em; color: var(--accent); word-break: break-all; }
   .gallery { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 24px max(16px, calc((100vw - 1080px) / 2)); }
   .gallery .phone { width: 220px; scroll-snap-align: start; }
+  .related { display: grid; padding: 0; overflow: hidden; margin-top: 24px; }
+  .related img { display: block; width: 100%; height: auto; border-bottom: 1px solid var(--line); }
+  .related .body { padding: 20px; }
+  .related .body p { margin: 0 0 16px; }
+  .related .cta { justify-content: flex-start; }
+  @media (min-width: 860px) {
+    .related { grid-template-columns: 1.2fr 1fr; align-items: center; }
+    .related img { border-bottom: 0; border-right: 1px solid var(--line); }
+    .related .body { padding: 28px; }
+  }
   .final { text-align: center; }
   .foot { margin-top: 88px; padding: 28px 16px 48px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
   .foot a { color: var(--accent); }

@@ -4,6 +4,9 @@ export const REPO = "https://github.com/suriyadi15/qrishook";
 export const RELEASES = `${REPO}/releases/latest`;
 export const SPONSOR = "https://github.com/sponsors/suriyadi15";
 export const TRAKTEER = "https://trakteer.id/suriyadi15/tip";
+export const QRISNAMIS_WEB = "https://qrisnamis.pages.dev/";
+export const QRISNAMIS_REPO = "https://github.com/suriyadi15/qrisnamis";
+export const QRISNAMIS_OG = "https://qrisnamis.pages.dev/og.png";
 
 export const merchants = [
   { name: "BRI Merchant", pkg: "id.co.bri.merchant" },
@@ -37,7 +40,7 @@ const id = {
   ogLocale: "id_ID",
   description:
     "Aplikasi Android yang membaca notifikasi pembayaran QRIS dari aplikasi merchant dan mengirimnya ke webhook milik Anda.",
-  nav: { features: "Fitur", how: "Cara kerja", merchants: "Merchant", docs: "Dokumentasi", support: "Traktir" },
+  nav: { features: "Fitur", how: "Cara kerja", merchants: "Merchant", related: "Proyek terkait", docs: "Dokumentasi", support: "Traktir" },
   hero: {
     badge: "Open source · MIT",
     h1a: "Ubah notifikasi QRIS",
@@ -69,6 +72,14 @@ const id = {
   requestParser: "Ajukan dukungan merchant",
   requestParserHref: "/docs/request-parser/",
   requestParserHint: "Dikirim langsung dari aplikasi, tanpa akun GitHub.",
+  related: {
+    title: "Pasangannya: qrisnamis",
+    sub: "Buat QRIS dinamis dengan nominal unik atau referensi pakai qrisnamis, lalu konfirmasi pembayarannya otomatis dengan QRIS Hook.",
+    body: "Ubah QRIS statis jadi dinamis — tambah nominal, biaya layanan, dan referensi. Library TypeScript tanpa dependensi, API gratis, dan generator di browser.",
+    web: "Buka website",
+    repo: "Lihat repo",
+    imgAlt: "qrisnamis — QRIS statis jadi dinamis",
+  },
   screensTitle: "Tampilan aplikasi",
   ctaTitle: "Siap menerima webhook pembayaran?",
   ctaSub: "Download APK terbaru dari GitHub Releases, atau build sendiri dari source.",
@@ -97,7 +108,7 @@ const en = {
   ogLocale: "en_US",
   description:
     "An Android app that watches QRIS payment notifications from merchant apps and sends them to a webhook you control.",
-  nav: { features: "Features", how: "How it works", merchants: "Merchants", docs: "Docs", support: "Support" },
+  nav: { features: "Features", how: "How it works", merchants: "Merchants", related: "Related", docs: "Docs", support: "Support" },
   hero: {
     badge: "Open source · MIT",
     h1a: "Turn QRIS notifications",
@@ -129,6 +140,14 @@ const en = {
   requestParser: "Request merchant support",
   requestParserHref: "/en/docs/request-parser/",
   requestParserHint: "Sent straight from the app, no GitHub account needed.",
+  related: {
+    title: "Pairs with qrisnamis",
+    sub: "Generate a dynamic QRIS with a unique amount or reference using qrisnamis, then confirm the payment automatically with QRIS Hook.",
+    body: "Turn a static QRIS into a dynamic one: add an amount, service fee, and reference. Zero-dependency TypeScript library, free API, and in-browser generator.",
+    web: "Visit website",
+    repo: "View repo",
+    imgAlt: "qrisnamis — static QRIS to dynamic",
+  },
   screensTitle: "App screenshots",
   ctaTitle: "Ready to receive payment webhooks?",
   ctaSub: "Download the latest APK from GitHub Releases, or build it from source.",
