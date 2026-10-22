@@ -11,7 +11,8 @@ import s6 from "../assets/screenshots/6.jpg";
 import s7 from "../assets/screenshots/7.jpg";
 
 const ghIcon = '<svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>';
-const heartIcon = '<svg viewBox="0 0 16 16" width="16" height="16" fill="#db61a2" aria-hidden="true"><path d="M4.25 2.5c-1.336 0-2.75 1.164-2.75 3 0 2.15 1.58 4.144 3.365 5.682A20.6 20.6 0 0 0 8 13.393a20.6 20.6 0 0 0 3.135-2.211C12.92 9.644 14.5 7.65 14.5 5.5c0-1.836-1.414-3-2.75-3-1.373 0-2.609.986-3.029 2.456a.749.749 0 0 1-1.442 0C6.859 3.486 5.623 2.5 4.25 2.5Z"/></svg>';
+const menuIcon = '<svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M1 2.75A.75.75 0 0 1 1.75 2h12.5a.75.75 0 0 1 0 1.5H1.75A.75.75 0 0 1 1 2.75Zm0 5A.75.75 0 0 1 1.75 7h12.5a.75.75 0 0 1 0 1.5H1.75A.75.75 0 0 1 1 7.75ZM1.75 12h12.5a.75.75 0 0 1 0 1.5H1.75a.75.75 0 0 1 0-1.5Z"/></svg>';
+const heartIcon ='<svg viewBox="0 0 16 16" width="16" height="16" fill="#db61a2" aria-hidden="true"><path d="M4.25 2.5c-1.336 0-2.75 1.164-2.75 3 0 2.15 1.58 4.144 3.365 5.682A20.6 20.6 0 0 0 8 13.393a20.6 20.6 0 0 0 3.135-2.211C12.92 9.644 14.5 7.65 14.5 5.5c0-1.836-1.414-3-2.75-3-1.373 0-2.609.986-3.029 2.456a.749.749 0 0 1-1.442 0C6.859 3.486 5.623 2.5 4.25 2.5Z"/></svg>';
 
 interface Props {
   locale: Locale;
@@ -85,13 +86,16 @@ const jsonLd = {
       <div class="wrap bar">
         <a class="brand" href={t.home}><img src="/favicon.svg" alt="" width="28" height="28" />QRIS Hook</a>
         <nav>
-          <a href="#features">{t.nav.features}</a>
-          <a href="#how">{t.nav.how}</a>
-          <a href="#merchants">{t.nav.merchants}</a>
-          <a href={t.docsBase}>{t.nav.docs}</a>
-          <a href="#support">{t.nav.support}</a>
+          <div class="links" id="nav-links">
+            <a href="#features">{t.nav.features}</a>
+            <a href="#how">{t.nav.how}</a>
+            <a href="#merchants">{t.nav.merchants}</a>
+            <a href={t.docsBase}>{t.nav.docs}</a>
+            <a href="#support">{t.nav.support}</a>
+          </div>
           <a href={t.other.href} class="lang" hreflang={locale === "id" ? "en" : "id"}>{t.other.label}</a>
-          <a href={REPO} class="gh" rel="noopener"><Fragment set:html={ghIcon} />GitHub</a>
+          <a href={REPO} class="gh" rel="noopener"><Fragment set:html={ghIcon} /><span>GitHub</span></a>
+          <button class="menu" type="button" aria-controls="nav-links" aria-expanded="false" aria-label="Menu"><Fragment set:html={menuIcon} /></button>
         </nav>
       </div>
     </header>
@@ -187,6 +191,18 @@ const jsonLd = {
       <p>{t.trademark}</p>
       <p>{t.license} © 2026 suriyadi15 · <a href={`${t.docsBase}privacy/`}>{t.privacy}</a></p>
     </footer>
+
+    <script>
+      const header = document.querySelector<HTMLElement>(".top")!;
+      const btn = header.querySelector<HTMLButtonElement>(".menu")!;
+      const setOpen = (open: boolean) => {
+        header.classList.toggle("open", open);
+        btn.setAttribute("aria-expanded", String(open));
+      };
+      btn.addEventListener("click", () => setOpen(!header.classList.contains("open")));
+      header.querySelectorAll(".links a").forEach((a) => a.addEventListener("click", () => setOpen(false)));
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape") setOpen(false); });
+    </script>
   </body>
 </html>
 
@@ -210,7 +226,17 @@ const jsonLd = {
   nav a:hover { color: var(--fg); }
   nav .gh, .btn.gh { display: inline-flex; align-items: center; gap: 6px; }
   nav .lang, nav .gh { border: 1px solid var(--line); padding: 3px 10px; border-radius: 8px; color: var(--fg); }
-  @media (max-width: 720px) { nav a:not(.lang):not(.gh) { display: none; } }
+  nav .links { display: flex; align-items: center; gap: 18px; }
+  nav .menu { display: none; align-items: center; justify-content: center; background: none; border: 1px solid var(--line); border-radius: 8px; padding: 5px 7px; color: var(--fg); cursor: pointer; }
+  @media (max-width: 720px) {
+    nav { gap: 10px; }
+    nav .menu { display: inline-flex; }
+    nav .links { display: none; position: absolute; top: 60px; left: 0; right: 0; flex-direction: column; align-items: stretch; gap: 0; padding: 4px 16px 8px; background: var(--bg); border-bottom: 1px solid var(--line); }
+    .top.open nav .links { display: flex; }
+    nav .links a { padding: 12px 0; font-size: 16px; }
+    nav .links a + a { border-top: 1px solid var(--line); }
+  }
+  @media (max-width: 380px) { nav .gh span { display: none; } }
   .hero { text-align: center; padding-top: 72px; overflow: hidden; }
   .badge { display: inline-block; font-size: 12px; padding: 4px 12px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); }
   h1 { font-size: clamp(2.2rem, 6vw, 4rem); line-height: 1.1; margin: 18px 0; letter-spacing: -0.03em; }
