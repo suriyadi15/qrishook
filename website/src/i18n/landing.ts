@@ -2,6 +2,8 @@ export type Locale = "id" | "en";
 
 export const REPO = "https://github.com/suriyadi15/qrishook";
 export const RELEASES = `${REPO}/releases/latest`;
+export const SPONSOR = "https://github.com/sponsors/suriyadi15";
+export const TRAKTEER = "https://trakteer.id/suriyadi15/tip";
 
 export const merchants = [
   { name: "BRI Merchant", pkg: "id.co.bri.merchant" },
@@ -35,7 +37,7 @@ const id = {
   ogLocale: "id_ID",
   description:
     "Aplikasi Android yang membaca notifikasi pembayaran QRIS dari aplikasi merchant dan mengirimnya ke webhook milik Anda.",
-  nav: { features: "Fitur", how: "Cara kerja", merchants: "Merchant", docs: "Dokumentasi" },
+  nav: { features: "Fitur", how: "Cara kerja", merchants: "Merchant", docs: "Dokumentasi", support: "Traktir" },
   hero: {
     badge: "Open source · MIT",
     h1a: "Ubah notifikasi QRIS",
@@ -71,6 +73,10 @@ const id = {
   ctaTitle: "Siap menerima webhook pembayaran?",
   ctaSub: "Download APK terbaru dari GitHub Releases, atau build sendiri dari source.",
   build: "Lihat source",
+  supportTitle: "Traktir pengembang",
+  supportSub: "QRIS Hook gratis dan open source. Kalau bermanfaat, traktir kopi lewat Trakteer atau GitHub Sponsors.",
+  trakteer: "Traktir di Trakteer",
+  sponsor: "GitHub Sponsors",
   disclaimer:
     "QRIS Hook hanya untuk pemantauan notifikasi yang sah, pada perangkat, akun merchant, dan endpoint yang Anda berhak akses. Anda bertanggung jawab penuh atas penggunaannya. Perangkat lunak disediakan \"apa adanya\" tanpa garansi.",
   disclaimerMore: "Selengkapnya",
@@ -91,7 +97,7 @@ const en = {
   ogLocale: "en_US",
   description:
     "An Android app that watches QRIS payment notifications from merchant apps and sends them to a webhook you control.",
-  nav: { features: "Features", how: "How it works", merchants: "Merchants", docs: "Docs" },
+  nav: { features: "Features", how: "How it works", merchants: "Merchants", docs: "Docs", support: "Support" },
   hero: {
     badge: "Open source · MIT",
     h1a: "Turn QRIS notifications",
@@ -127,6 +133,10 @@ const en = {
   ctaTitle: "Ready to receive payment webhooks?",
   ctaSub: "Download the latest APK from GitHub Releases, or build it from source.",
   build: "View source",
+  supportTitle: "Support the project",
+  supportSub: "QRIS Hook is free and open source. If it helps you, buy me a coffee via Trakteer or GitHub Sponsors.",
+  trakteer: "Tip on Trakteer",
+  sponsor: "GitHub Sponsors",
   disclaimer:
     "QRIS Hook is for lawful notification monitoring on devices, merchant accounts and endpoints you have the right to access. You are solely responsible for its use. The software is provided \"as is\", without warranty.",
   disclaimerMore: "Read more",

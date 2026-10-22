@@ -6,6 +6,8 @@ QRIS Hook is a native Android Kotlin app that watches QRIS payment notifications
 [![Download APK](https://img.shields.io/github/downloads/suriyadi15/qrishook/latest/total?label=Download%20APK&color=green&logo=android)](https://github.com/suriyadi15/qrishook/releases/latest)
 [![Total Downloads](https://img.shields.io/github/downloads/suriyadi15/qrishook/total?label=Total%20Downloads&color=brightgreen&logo=github)](https://github.com/suriyadi15/qrishook/releases)
 [![Release Date](https://img.shields.io/github/release-date/suriyadi15/qrishook?label=Released)](https://github.com/suriyadi15/qrishook/releases/latest)
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/suriyadi15?label=Sponsor&logo=githubsponsors&color=EA4AAA)](https://github.com/sponsors/suriyadi15)
+[![Trakteer](https://img.shields.io/badge/Trakteer-Traktir-BE1E2D)](https://trakteer.id/suriyadi15/tip)
 
 [![Deploy Website](https://github.com/suriyadi15/qrishook/actions/workflows/website.yml/badge.svg)](https://github.com/suriyadi15/qrishook/actions/workflows/website.yml)
 [![Website](https://img.shields.io/website?url=https%3A%2F%2Fqrishook.pages.dev&label=Website)](https://qrishook.pages.dev)
@@ -297,6 +299,10 @@ The app posts to a Cloudflare Pages Function (`website/functions/api/merchant-re
 The function limits each IP to 5 requests per hour using the Cache API, so no paid Cloudflare plan or extra binding is needed. This is best-effort per data center, not a hard guarantee.
 
 For local development, put the variables in `website/.dev.vars` (git-ignored) and run `npx wrangler pages dev dist`.
+
+## Support
+
+QRIS Hook is free and open source. If it saves you time, you can support development via [GitHub Sponsors](https://github.com/sponsors/suriyadi15) or [Trakteer](https://trakteer.id/suriyadi15/tip).
 
 ## License
 
