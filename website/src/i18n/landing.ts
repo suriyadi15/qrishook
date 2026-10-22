@@ -30,6 +30,9 @@ const id = {
   home: "/",
   other: { label: "EN", href: "/en/" },
   title: "QRIS Hook — Notifikasi QRIS jadi webhook",
+  ogImage: "/og.png",
+  ogImageAlt: "QRIS Hook — Ubah notifikasi QRIS jadi webhook",
+  ogLocale: "id_ID",
   description:
     "Aplikasi Android yang membaca notifikasi pembayaran QRIS dari aplikasi merchant dan mengirimnya ke webhook milik Anda.",
   nav: { features: "Fitur", how: "Cara kerja", merchants: "Merchant", docs: "Dokumentasi" },
@@ -83,6 +86,9 @@ const en = {
   home: "/en/",
   other: { label: "ID", href: "/" },
   title: "QRIS Hook — Turn QRIS notifications into webhooks",
+  ogImage: "/og-en.png",
+  ogImageAlt: "QRIS Hook — Turn QRIS notifications into webhooks",
+  ogLocale: "en_US",
   description:
     "An Android app that watches QRIS payment notifications from merchant apps and sends them to a webhook you control.",
   nav: { features: "Features", how: "How it works", merchants: "Merchants", docs: "Docs" },

@@ -18,6 +18,23 @@ interface Props {
 const { locale } = Astro.props;
 const t = dict[locale];
 const shots = [s1, s2, s3, s4, s5, s6, s7];
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = new URL(t.ogImage, Astro.site).href;
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "QRIS Hook",
+  description: t.description,
+  url: canonical,
+  inLanguage: t.lang,
+  operatingSystem: "Android",
+  applicationCategory: "FinanceApplication",
+  license: "https://opensource.org/licenses/MIT",
+  downloadUrl: RELEASES,
+  codeRepository: REPO,
+  image: ogImage,
+  offers: { "@type": "Offer", price: "0", priceCurrency: "IDR" },
+};
 ---
 
 <!doctype html>
@@ -27,12 +44,31 @@ const shots = [s1, s2, s3, s4, s5, s6, s7];
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{t.title}</title>
     <meta name="description" content={t.description} />
+    <meta name="theme-color" content="#07110f" />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="QRIS Hook" />
+    <meta property="og:url" content={canonical} />
     <meta property="og:title" content={t.title} />
     <meta property="og:description" content={t.description} />
-    <meta property="og:type" content="website" />
+    <meta property="og:locale" content={t.ogLocale} />
+    <meta property="og:locale:alternate" content={locale === "id" ? dict.en.ogLocale : dict.id.ogLocale} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={t.ogImageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={t.title} />
+    <meta name="twitter:description" content={t.description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={t.ogImageAlt} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="alternate" hreflang="id" href={new URL("/", Astro.site)} />
     <link rel="alternate" hreflang="en" href={new URL("/en/", Astro.site)} />
+    <link rel="alternate" hreflang="x-default" href={new URL("/", Astro.site)} />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
     <script is:inline>
       try {
         const saved = localStorage.getItem("starlight-theme");

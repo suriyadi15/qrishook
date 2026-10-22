@@ -9,6 +9,13 @@ export default defineConfig({
       title: "QRIS Hook",
       description: "Android app that turns QRIS payment notifications into webhooks.",
       favicon: "/favicon.svg",
+      head: [
+        { tag: "meta", attrs: { property: "og:image", content: "https://qrishook.pages.dev/og.png" } },
+        { tag: "meta", attrs: { property: "og:image:width", content: "1200" } },
+        { tag: "meta", attrs: { property: "og:image:height", content: "630" } },
+        { tag: "meta", attrs: { name: "twitter:image", content: "https://qrishook.pages.dev/og.png" } },
+        { tag: "meta", attrs: { name: "theme-color", content: "#07110f" } },
+      ],
       defaultLocale: "root",
       locales: {
         root: { label: "Bahasa Indonesia", lang: "id" },

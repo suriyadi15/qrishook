@@ -11,6 +11,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
+    "og": "node scripts/og.mjs",
     "deploy": "astro build && wrangler pages deploy dist --project-name qrishook"
   },
   "dependencies": {
