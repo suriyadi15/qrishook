@@ -7,7 +7,6 @@ QRIS Hook is a native Android Kotlin app that watches QRIS payment notifications
 [![Total Downloads](https://img.shields.io/github/downloads/suriyadi15/qrishook/total?label=Total%20Downloads&color=brightgreen&logo=github)](https://github.com/suriyadi15/qrishook/releases)
 [![Release Date](https://img.shields.io/github/release-date/suriyadi15/qrishook?label=Released)](https://github.com/suriyadi15/qrishook/releases/latest)
 
-[![Release Build](https://github.com/suriyadi15/qrishook/actions/workflows/release.yml/badge.svg)](https://github.com/suriyadi15/qrishook/actions/workflows/release.yml)
 [![Deploy Website](https://github.com/suriyadi15/qrishook/actions/workflows/website.yml/badge.svg)](https://github.com/suriyadi15/qrishook/actions/workflows/website.yml)
 [![Website](https://img.shields.io/website?url=https%3A%2F%2Fqrishook.pages.dev&label=Website)](https://qrishook.pages.dev)
 
