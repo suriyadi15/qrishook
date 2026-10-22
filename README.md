@@ -4,6 +4,22 @@ QRIS Hook is a native Android Kotlin app that watches QRIS payment notifications
 
 [![Latest Release](https://img.shields.io/github/v/release/suriyadi15/qrishook?color=blue&label=Release&logo=github)](https://github.com/suriyadi15/qrishook/releases/latest)
 [![Download APK](https://img.shields.io/github/downloads/suriyadi15/qrishook/latest/total?label=Download%20APK&color=green&logo=android)](https://github.com/suriyadi15/qrishook/releases/latest)
+[![Total Downloads](https://img.shields.io/github/downloads/suriyadi15/qrishook/total?label=Total%20Downloads&color=brightgreen&logo=github)](https://github.com/suriyadi15/qrishook/releases)
+[![Release Date](https://img.shields.io/github/release-date/suriyadi15/qrishook?label=Released)](https://github.com/suriyadi15/qrishook/releases/latest)
+
+[![Release Build](https://github.com/suriyadi15/qrishook/actions/workflows/release.yml/badge.svg)](https://github.com/suriyadi15/qrishook/actions/workflows/release.yml)
+[![Deploy Website](https://github.com/suriyadi15/qrishook/actions/workflows/website.yml/badge.svg)](https://github.com/suriyadi15/qrishook/actions/workflows/website.yml)
+[![Website](https://img.shields.io/website?url=https%3A%2F%2Fqrishook.pages.dev&label=Website)](https://qrishook.pages.dev)
+
+[![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white)](https://developer.android.com)
+[![Min SDK](https://img.shields.io/badge/Min%20SDK-26-3DDC84)](app/build.gradle.kts)
+[![Target SDK](https://img.shields.io/badge/Target%20SDK-36-3DDC84)](app/build.gradle.kts)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.2.20-7F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org)
+[![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-4285F4?logo=jetpackcompose&logoColor=white)](https://developer.android.com/jetpack/compose)
+[![License](https://img.shields.io/github/license/suriyadi15/qrishook?color=blue)](LICENSE)
+[![Stars](https://img.shields.io/github/stars/suriyadi15/qrishook?style=flat&logo=github)](https://github.com/suriyadi15/qrishook/stargazers)
+[![Issues](https://img.shields.io/github/issues/suriyadi15/qrishook)](https://github.com/suriyadi15/qrishook/issues)
+[![Last Commit](https://img.shields.io/github/last-commit/suriyadi15/qrishook)](https://github.com/suriyadi15/qrishook/commits/main)
 
 ## Website and Documentation
 
