@@ -11,6 +11,7 @@ export const QRISNAMIS_OG = "https://qrisnamis.pages.dev/og.png";
 export const merchants = [
   { name: "BRI Merchant", pkg: "id.co.bri.merchant" },
   { name: "GoPay Merchant", pkg: "com.gojek.gopaymerchant" },
+  { name: "DANA Bisnis", pkg: "id.dana" },
   { name: "InterActive QRIS", pkg: "com.interactive.qrisid" },
 ];
 

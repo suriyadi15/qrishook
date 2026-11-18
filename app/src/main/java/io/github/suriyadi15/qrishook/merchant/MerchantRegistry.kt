@@ -5,6 +5,7 @@ object MerchantRegistry {
         InterActiveQrisMerchantParser,
         BriMerchantParser,
         GoPayMerchantParser,
+        DanaMerchantParser,
     )
 
     fun selectedParsers(selectedMerchantIds: Set<String>): List<MerchantParser> {
